@@ -7,8 +7,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # Tk main window
 root = tk.Tk()
 root.title("Vector Addition")
-frame = tk.Frame(root)
-frame.grid(row=0,column=1)
+
+# Frame/Container for Graph
 frame = tk.Frame(root)
 frame.grid(row=0,column=1)
 
