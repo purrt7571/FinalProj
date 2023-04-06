@@ -1,6 +1,6 @@
-import math
+import numpy as np
 
 # Test line
-print(math.sqrt(25))
+print(np.hypot(5,3))
 print("Hello")
 print("World")
