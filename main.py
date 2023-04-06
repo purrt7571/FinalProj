@@ -9,6 +9,8 @@ root = tk.Tk()
 root.title("Vector Addition")
 frame = tk.Frame(root)
 frame.grid(row=0,column=1)
+frame = tk.Frame(root)
+frame.grid(row=0,column=1)
 
 # Setup Graph elements
 fig = Figure()
