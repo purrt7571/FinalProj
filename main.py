@@ -23,6 +23,7 @@ root.grid_columnconfigure(0, weight=1)
 root.grid_columnconfigure(1, weight=0)
 root.grid_columnconfigure(2, weight=3)
 root.grid_rowconfigure(0, weight=1)
+root.grid_rowconfigure(1, weight=0)
 
 # Initialize dict[np.array] for vectors and resultant for sum
 vct: dict[np.array] = {}
@@ -31,7 +32,7 @@ resultant_x = tk.StringVar(value="0.0000")
 resultant_y = tk.StringVar(value="0.0000")
 
 # Frame/Container for buttons/labels/textboxes/checkboxes
-control_frame = tk.Frame(root)
+control_frame = ttk.Frame(root)
 control_frame.grid(column=0, row=0, sticky='nsew')
 control_frame.grid_columnconfigure(0, weight=1)
 control_frame.grid_columnconfigure(1, weight=0)
@@ -78,17 +79,17 @@ scroll = tk.Scrollbar(control_frame, orient="vertical")
 scroll.grid(column=1, row=0, rowspan=1, sticky="nse")
 
 # Display vector values
-tree_canvas = ttk.Frame(root)
-tree_canvas.grid(column=1, row=0, sticky="nsew")
-tree_canvas.grid_columnconfigure(0,weight=1)
-tree_canvas.grid_columnconfigure(1,weight=3)
-tree_canvas.grid_columnconfigure(2,weight=1)
-tree_canvas.grid_columnconfigure(3,weight=3)
-tree_canvas.grid_rowconfigure(0, weight=1)
-tree_canvas.grid_rowconfigure(1, weight=0)
+resultant_canvas = tk.Frame(root, background="white")
+resultant_canvas.grid(column=1, row=1, sticky="nsew")
+resultant_canvas.grid_columnconfigure(0,weight=1)
+resultant_canvas.grid_columnconfigure(1,weight=3)
+resultant_canvas.grid_columnconfigure(2,weight=1)
+resultant_canvas.grid_columnconfigure(3,weight=3)
+resultant_canvas.grid_rowconfigure(0, weight=0)
 
-tree = ttk.Treeview(tree_canvas, columns=("c1", "c2", "c3"), show="headings")
-tree.grid(column=0, row=0, columnspan=4, sticky="nsew")
+
+tree = ttk.Treeview(root, columns=("c1", "c2", "c3"), show="headings")
+tree.grid(column=1, row=0, sticky="nsew")
 tree.column("# 1", width=70)
 tree.column("# 2", width=100, anchor="e")
 tree.column("# 3", width=100, anchor="e")
@@ -96,30 +97,23 @@ tree.heading("# 1", text="Name")
 tree.heading("# 2", text="X")
 tree.heading("# 3", text="Y")
 
-result_x_label = ttk.Label(tree_canvas, text="X = ")
-result_y_label = ttk.Label(tree_canvas, text="Y = ")
-result_x_label.grid(column=0, row=1, sticky="w", padx=(10,0), pady=5)
-result_y_label.grid(column=2, row=1, sticky="w", pady=5)
+result_x_label = ttk.Label(resultant_canvas, text="X = ", background="white")
+result_y_label = ttk.Label(resultant_canvas, text="Y = ", background="white")
+result_x_label.grid(column=0, row=1, sticky="nsw", padx=(10,0), pady=10)
+result_y_label.grid(column=2, row=1, sticky="nsw", pady=10)
 
-result_x = ttk.Label(tree_canvas, textvariable=resultant_x)
-result_y = ttk.Label(tree_canvas, textvariable=resultant_y)
-result_x.grid(column=1, row=1, sticky="w", pady=5)
-result_y.grid(column=3, row=1, sticky="w", padx=(0,10), pady=5)
-
-# Frame/Container for Graph
-canvas_frame = tk.Frame(root, background="blue")
-canvas_frame.grid(column=2, row=0, sticky="nsew")
-canvas_frame.grid_rowconfigure(0, weight=1)
-canvas_frame.grid_rowconfigure(1, weight=0)
-canvas_frame.grid_columnconfigure(0, weight=1)
+result_x = ttk.Label(resultant_canvas, textvariable=resultant_x, background="white")
+result_y = ttk.Label(resultant_canvas, textvariable=resultant_y, background="white")
+result_x.grid(column=1, row=1, sticky="nsw", pady=10)
+result_y.grid(column=3, row=1, sticky="nsw", padx=(0,10), pady=10)
 
 # Setup Graph elements
 fig = plt.figure()
 plot = fig.add_subplot()
-canvas = FigureCanvasTkAgg(figure=fig, master=canvas_frame)
-canvas.get_tk_widget().grid(column=0, row=0, sticky='nsew')
-toolbar = NavigationToolbar2Tk(canvas = canvas, window = canvas_frame, pack_toolbar = False)
-toolbar.grid(column=0, row=1, sticky='sew')
+canvas = FigureCanvasTkAgg(figure=fig, master=root)
+canvas.get_tk_widget().grid(column=2, row=0, sticky='nsew')
+toolbar = NavigationToolbar2Tk(canvas = canvas, window = root, pack_toolbar = False)
+toolbar.grid(column=2, row=1, sticky='sew')
 
 # Set closing sequence
 root.protocol("WM_DELETE_WINDOW", on_close)
