@@ -29,7 +29,7 @@ def add_vector() -> None:
         x = float(requirement1_txtbox.get())
         y = float(requirement2_txtbox.get())
         r = np.round(np.hypot(x,y), 6)
-        theta = np.round(np.arctan2(y, x), 6)
+        theta = np.round(np.rad2deg(np.arctan2(y, x)), 6)
     vct[vector_name] = np.array([x,y])
     tree.insert("", "end", vector_name, values=(vector_name, x, y, r, theta))
     get_resultant()
