@@ -17,9 +17,16 @@ vct: dict[np.array] = {}
 # Tk main window
 root = tk.Tk()
 root.title("Vector Addition")
+root.minsize(1200, 800)
+
+# Frame/Container for buttons/labels/textboxes/checkboxes
+control_frame = tk.Frame(root)
+control_frame.pack(side='left', fill='both', expand=True)
+
+
 
 # Frame/Container for Graph
-canvas_frame = tk.Frame(root, background="green")
+canvas_frame = tk.Frame(root)
 canvas_frame.pack(side="right", fill="both", expand=True)
 
 # Setup Graph elements
