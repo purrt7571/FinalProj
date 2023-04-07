@@ -1,4 +1,3 @@
-import math
 import numpy as np
-list = [np.array([5*math.cos(60), 5*math.sin(60)]), np.array([10*math.cos(90), 10*math.sin(90)])]
+list = [np.array([5*np.cos(np.radians(60)), 5*np.sin(np.radians(60))]), np.array([10*np.cos(np.radians(90)), 10*np.sin(np.radians(90))])]
 print(sum(list))
