@@ -11,8 +11,29 @@ def on_close() -> None:
     root.destroy()
     return
 
-def add_vector():
-    pass
+def get_resultant() -> None:
+    global resultant, resultant_x, resultant_y
+    resultant = sum(vct.values())
+    resultant_x.set(value="%.4f" % resultant[0])
+    resultant_y.set(value="%.4f" % resultant[1])
+    return
+
+def add_vector() -> None:
+    vector_name = name_txtbox.get()
+    if coordinate_choice.get():
+        r = np.round(float(requirement1_txtbox.get()), 6)
+        theta = np.round(float(requirement2_txtbox.get()), 6)
+        x = np.round(r * np.cos(np.radians(theta)), 6)
+        y = np.round(r * np.sin(np.radians(theta)), 6)
+    else:
+        x = float(requirement1_txtbox.get())
+        y = float(requirement2_txtbox.get())
+        r = np.round(np.hypot(x,y), 6)
+        theta = np.round(np.arctan2(y, x), 6)
+    vct[vector_name] = np.array([x,y])
+    tree.insert("", "end", vector_name, values=(vector_name, x, y, r, theta))
+    get_resultant()
+    return
 
 
 # Tk main window
@@ -27,7 +48,7 @@ root.grid_rowconfigure(1, weight=0)
 
 # Initialize dict[np.array] for vectors and resultant for sum
 vct: dict[np.array] = {}
-resultant: np.array = np.array([0,0])
+resultant = np.array([0,0])
 resultant_x = tk.StringVar(value="0.0000")
 resultant_y = tk.StringVar(value="0.0000")
 
@@ -87,15 +108,18 @@ resultant_canvas.grid_columnconfigure(2,weight=1)
 resultant_canvas.grid_columnconfigure(3,weight=3)
 resultant_canvas.grid_rowconfigure(0, weight=0)
 
-
-tree = ttk.Treeview(root, columns=("c1", "c2", "c3"), show="headings")
+tree = ttk.Treeview(root, columns=("c1", "c2", "c3", "c4", "c5"), show="headings")
 tree.grid(column=1, row=0, sticky="nsew")
 tree.column("# 1", width=70)
 tree.column("# 2", width=100, anchor="e")
 tree.column("# 3", width=100, anchor="e")
+tree.column("# 4", width=100, anchor="e")
+tree.column("# 5", width=100, anchor="e")
 tree.heading("# 1", text="Name")
 tree.heading("# 2", text="X")
 tree.heading("# 3", text="Y")
+tree.heading("# 4", text="R")
+tree.heading("# 5", text="\u03B8")
 
 result_x_label = ttk.Label(resultant_canvas, text="X = ", background="white")
 result_y_label = ttk.Label(resultant_canvas, text="Y = ", background="white")
