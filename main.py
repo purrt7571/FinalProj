@@ -15,10 +15,6 @@ def add_vector():
     pass
 
 
-# Initialize dict[np.array] for vectors and resultant for sum
-vct: dict[np.array] = {}
-resultant: np.array = np.array([0,0])
-
 # Tk main window
 root = tk.Tk()
 root.title("Vector Addition")
@@ -27,6 +23,12 @@ root.grid_columnconfigure(0, weight=1)
 root.grid_columnconfigure(1, weight=0)
 root.grid_columnconfigure(2, weight=3)
 root.grid_rowconfigure(0, weight=1)
+
+# Initialize dict[np.array] for vectors and resultant for sum
+vct: dict[np.array] = {}
+resultant: np.array = np.array([0,0])
+resultant_x = tk.StringVar(value="0.0000")
+resultant_y = tk.StringVar(value="0.0000")
 
 # Frame/Container for buttons/labels/textboxes/checkboxes
 control_frame = tk.Frame(root)
@@ -76,14 +78,33 @@ scroll = tk.Scrollbar(control_frame, orient="vertical")
 scroll.grid(column=1, row=0, rowspan=1, sticky="nse")
 
 # Display vector values
-tree = ttk.Treeview(root, columns=("c1", "c2", "c3"), show="headings")
-tree.grid(column=1, row=0, sticky="nsw")
+tree_canvas = ttk.Frame(root)
+tree_canvas.grid(column=1, row=0, sticky="nsew")
+tree_canvas.grid_columnconfigure(0,weight=1)
+tree_canvas.grid_columnconfigure(1,weight=3)
+tree_canvas.grid_columnconfigure(2,weight=1)
+tree_canvas.grid_columnconfigure(3,weight=3)
+tree_canvas.grid_rowconfigure(0, weight=1)
+tree_canvas.grid_rowconfigure(1, weight=0)
+
+tree = ttk.Treeview(tree_canvas, columns=("c1", "c2", "c3"), show="headings")
+tree.grid(column=0, row=0, columnspan=4, sticky="nsew")
 tree.column("# 1", width=70)
 tree.column("# 2", width=100, anchor="e")
 tree.column("# 3", width=100, anchor="e")
 tree.heading("# 1", text="Name")
 tree.heading("# 2", text="X")
 tree.heading("# 3", text="Y")
+
+result_x_label = ttk.Label(tree_canvas, text="X = ")
+result_y_label = ttk.Label(tree_canvas, text="Y = ")
+result_x_label.grid(column=0, row=1, sticky="w", padx=(10,0), pady=5)
+result_y_label.grid(column=2, row=1, sticky="w", pady=5)
+
+result_x = ttk.Label(tree_canvas, textvariable=resultant_x)
+result_y = ttk.Label(tree_canvas, textvariable=resultant_y)
+result_x.grid(column=1, row=1, sticky="w", pady=5)
+result_y.grid(column=3, row=1, sticky="w", padx=(0,10), pady=5)
 
 # Frame/Container for Graph
 canvas_frame = tk.Frame(root, background="blue")
