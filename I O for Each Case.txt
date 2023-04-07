@@ -1,0 +1,191 @@
+CASES OF VECTOR ADDITION (I/O)
+Case 1 - Resultant Vector is Unknown
+        Assumption:
+            There are given vectors with NO missing magnitudes or directions
+
+        Input:
+            Is the vector quantity a displacement, velocity, acceleration, or force?
+            Anong unit of magnitude ang ineexpect na unit ng resultant vector?
+            Anong unit of angle/direction ang ineexpect na unit ng resultant vector?
+
+            For the given vectors:
+                Vector's magnitude and current unit
+                Vector's angle and current unit
+
+        Output:
+            Resultant Vector's Magnitude and Direction
+            Graph (Cartesian/Polar)                                 # Ipakita na lang natin ang both graphs na nasa Cartesian and Polar
+            X and Y Components of the Resultant Vector              # Numerical lang, there is NO need for a graph
+
+
+Case 2 - A Vector's Magnitude is Missing
+        Assumptions:
+            There are other given vectors (magnitude and direction are given) aside from the missing vector itself
+            The angle/direction of the missing vector is given
+            Resultant vector's magnitude and direction are given
+
+        Input:
+            Is the vector quantity a displacement, velocity, acceleration, or force?
+            Anong unit of magnitude ang ineexpect na unit ng missing vector?     
+            Anong unit of angle/direction ang ineexpect na unit ng missing vector?
+
+            For the missing vector:
+                The missing vector's angle and its current unit
+
+            For the given vectors:
+                Vector's magnitude and current unit
+                Vector's angle and current unit
+
+            For the resultant vectors:
+                Resultant Vector's magnitude and current unit
+                Resultant Vector's angle and current unit                
+
+        Output:
+            Missing Vector's Magnitude and Direction
+            Graph (Cartesian/Polar)                                 # Ipakita na lang natin ang both graphs na nasa Cartesian and Polar
+            X and Y Components of the Missing Vector                # Numerical lang, there is NO need for a graph
+
+
+Case 3 - A Vector's Direction is Missing
+        Assumptions:
+            There are other given vectors (magnitude and direction are given) aside from the missing vector itself
+            The magnitude of the missing vector is given
+            Resultant vector's magnitude and direction are given
+        
+        Input:
+            Is the vector quantity a displacement, velocity, acceleration, or force?
+            Anong unit of magnitude ang ineexpect na unit ng missing vector?     
+            Anong unit of angle/direction ang ineexpect na unit ng missing vector?
+
+            For the missing vector:
+                The missing vector's magnitude and its current unit
+
+            For the given vectors:
+                Vector's magnitude and current unit
+                Vector's angle and current unit
+
+            For the resultant vectors:
+                Resultant Vector's magnitude and current unit
+                Resultant Vector's angle and current unit                
+
+        Output:
+            Missing Vector's Magnitude and Direction
+            Graph (Cartesian/Polar)                                 # Ipakita na lang natin ang both graphs na nasa Cartesian and Polar
+            X and Y Components of the Missing Vector                # Numerical lang, there is NO need for a graph
+
+
+Case 4 - A Vector's Magnitude and Direction are Missing
+        Assumptions:
+            There are other given vectors (magnitude and direction are given) aside from the missing vector itself
+            Resultant vector's magnitude and direction are given
+
+        Input:
+            Is the vector quantity a displacement, velocity, acceleration, or force?
+            Anong unit of magnitude ang ineexpect na unit ng missing vector?     
+            Anong unit of angle/direction ang ineexpect na unit ng missing vector?
+
+            For the given vectors:
+                Vector's magnitude and current unit
+                Vector's angle and current unit
+
+            For the resultant vectors:
+                Resultant Vector's magnitude and current unit
+                Resultant Vector's angle and current unit                
+
+        Output:
+            Missing Vector's Magnitude and Direction
+            Graph (Cartesian/Polar)                                 # Ipakita na lang natin ang both graphs na nasa Cartesian and Polar
+            X and Y Components of the Missing Vector                # Numerical lang, there is NO need for a graph
+
+
+Case 5 - Two Vectors' Magnitudes are Missing (Ex. Vectors A and B)
+        Assumptions:
+            There are other given vectors (magnitude and direction are given) aside from the missing vectors themselves
+            The angles/directions of the missing vectors are given
+            Resultant vector's magnitude and direction are given
+
+        Input:
+            Is the vector quantity a displacement, velocity, acceleration, or force?
+            Anong unit of magnitude ang ineexpect na unit ng missing vectors?     
+            Anong unit of angle/direction ang ineexpect na unit ng missing vectors?
+
+            For the missing vectors:
+                Vector A's angle and its current unit
+                Vector B's angle and its current unit
+
+            For the given vectors:
+                Vector's magnitude and current unit
+                Vector's angle and current unit
+
+            For the resultant vectors:
+                Resultant Vector's magnitude and current unit
+                Resultant Vector's angle and current unit                
+
+        Output:
+            Vector A's Magnitude and Direction
+            Vector B's Magnitude and Direction
+            Graph (Cartesian/Polar)                                 # Ipakita na lang natin ang both graphs na nasa Cartesian and Polar
+            X and Y Components of the Missing Vector A              # Numerical lang, there is NO need for a graph
+            X and Y Components of the Missing Vector B              # Numerical lang, there is NO need for a graph
+
+
+Case 6 - Two Vectors' Angles/Directions are Missing (Ex. Vectors A and B)
+        Assumptions:
+            There are other given vectors (magnitude and direction are given) aside from the missing vectors themselves
+            The magnitudes of the missing vectors are given
+            Resultant vector's magnitude and direction are given
+
+        Input:
+            Is the vector quantity a displacement, velocity, acceleration, or force?
+            Anong unit of magnitude ang ineexpect na unit ng missing vectors?     
+            Anong unit of angle/direction ang ineexpect na unit ng missing vectors?
+
+            For the missing vectors:
+                Vector A's magnitude and its current unit
+                Vector B's magnitude and its current unit
+
+            For the given vectors:
+                Vector's magnitude and current unit
+                Vector's angle and current unit
+
+            For the resultant vectors:
+                Resultant Vector's magnitude and current unit
+                Resultant Vector's angle and current unit                
+
+        Output:
+            Vector A's Magnitude and Direction
+            Vector B's Magnitude and Direction
+            Graph (Cartesian/Polar)                                 # Ipakita na lang natin ang both graphs na nasa Cartesian and Polar
+            X and Y Components of the Missing Vector A              # Numerical lang, there is NO need for a graph
+            X and Y Components of the Missing Vector B              # Numerical lang, there is NO need for a graph
+
+Case 7 - Vector A's magnitude and Vector B's direction are missing
+        Assumptions:
+            There are other given vectors (magnitude and direction are given) aside from the missing vectors themselves
+            Vector A's angle/direction is given
+            Vector B's magnitude is given
+            Resultant vector's magnitude and direction are given
+
+        Input:
+            Is the vector quantity a displacement, velocity, acceleration, or force?
+            Anong unit of magnitude ang ineexpect na unit ng missing vectors?     
+            Anong unit of angle/direction ang ineexpect na unit ng missing vectors?
+
+            For the missing vectors:
+                Vector A's angle and its current unit
+                Vector B's magnitude and its current unit
+
+            For the given vectors:
+                Vector's magnitude and current unit
+                Vector's angle and current unit
+
+            For the resultant vectors:
+                Resultant Vector's magnitude and current unit
+                Resultant Vector's angle and current unit                
+
+        Output:
+            Vector A's Magnitude and Direction
+            Vector B's Magnitude and Direction
+            Graph (Cartesian/Polar)                                 # Ipakita na lang natin ang both graphs na nasa Cartesian and Polar
+            X and Y Components of the Missing Vector A              # Numerical lang, there is NO need for a graph
+            X and Y Components of the Missing Vector B              # Numerical lang, there is NO need for a graph
