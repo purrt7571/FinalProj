@@ -32,11 +32,14 @@ def get_resultant() -> None:
 
 def add_vector() -> None:
     global plot, vct_plt
-    vector_name = name_txtbox.get()
-    if vector_name in vct_plt:
+    vector_name = vector_name_txtbox.get()
+    if vector_name == "":
+        showerror("Error", "Vector name is empty!")
+        return
+    elif vector_name in vct_plt:
         showerror("Error", f"Vector \"{vector_name}\" already exists!")
         return
-    if coordinate_choice.get():
+    elif coordinate_choice.get():
         r = float(requirement1_txtbox.get())
         theta = float(requirement2_txtbox.get())
         x = r * np.cos(np.radians(theta))
@@ -91,10 +94,10 @@ add_vector_frame.grid_rowconfigure(1, weight=0)
 add_vector_frame.grid_rowconfigure(2, weight=0)
 add_vector_frame.grid_rowconfigure(3, weight=0)
 
-name_label = ttk.Label(add_vector_frame, text="Vector name: ")
-name_label.grid(column=0, row=0, sticky="nw", padx=10)
-name_txtbox = ttk.Entry(add_vector_frame)
-name_txtbox.grid(column=1, row=0, columnspan=3, sticky="new", padx=10)
+vector_name_label = ttk.Label(add_vector_frame, text="Vector name: ")
+vector_name_label.grid(column=0, row=0, sticky="nw", padx=10)
+vector_name_txtbox = ttk.Entry(add_vector_frame)
+vector_name_txtbox.grid(column=1, row=0, columnspan=3, sticky="new", padx=10)
 
 requirement1_label = ttk.Label(add_vector_frame, text="X / R : ")
 requirement2_label = ttk.Label(add_vector_frame, text="Y / \u03B8 : ")
