@@ -4,11 +4,23 @@ import tkinter.ttk as ttk
 import matplotlib.pyplot as plt
 from matplotlib.backends._backend_tk import NavigationToolbar2Tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from tkinter.messagebox import showerror
 
 # Close matplotlib figure then close program
 def on_close() -> None:
     plt.close(fig)
     root.destroy()
+    return
+
+def rescale_graph() -> None:
+    global plot, canvas
+    x = [i[0] for i in vct.values()] + [resultant[0]]
+    y = [i[1] for i in vct.values()] + [resultant[1]]
+    x_min, x_max = np.floor(min(*x, 0)) - 1, np.ceil(max(*x, 0)) + 1
+    y_min, y_max = np.floor(min(*y, 0)) - 1, np.ceil(max(*y, 0)) + 1
+    plot.set_xlim(x_min, x_max)
+    plot.set_ylim(y_min, y_max)
+    canvas.draw()
     return
 
 def get_resultant() -> None:
@@ -23,20 +35,29 @@ def get_resultant() -> None:
     return
 
 def add_vector() -> None:
-    vector_name = name_txtbox.get()
-    if coordinate_choice.get():
-        r = np.round(float(requirement1_txtbox.get()), 6)
-        theta = np.round(float(requirement2_txtbox.get()), 6)
-        x = np.round(r * np.cos(np.radians(theta)), 6)
-        y = np.round(r * np.sin(np.radians(theta)), 6)
+    global plot, vct_plt
+    vector_name = vector_name_txtbox.get()
+    if vector_name == "":
+        showerror("Error", "Vector name is empty!")
+        return
+    elif vector_name in vct_plt:
+        showerror("Error", f"Vector \"{vector_name}\" already exists!")
+        return
+    elif coordinate_choice.get():
+        r = float(requirement1_txtbox.get())
+        theta = float(requirement2_txtbox.get())
+        x = r * np.cos(np.radians(theta))
+        y = r * np.sin(np.radians(theta))
     else:
         x = float(requirement1_txtbox.get())
         y = float(requirement2_txtbox.get())
-        r = np.round(np.hypot(x,y), 6)
-        theta = np.round(np.rad2deg(np.arctan2(y, x)), 6)
+        r = np.hypot(x,y)
+        theta = np.rad2deg(np.arctan2(y, x))
     vct[vector_name] = np.array([x,y])
-    tree.insert("", "end", vector_name, values=(vector_name, x, y, r, theta))
+    vct_plt[vector_name] = plot.quiver(0, 0, x, y, alpha=0.2, color='g', scale=1, scale_units='xy', angles='xy')
+    tree.insert("", "end", vector_name, values=(vector_name, "%.6f" % x, "%.6f" % y, "%.6f" % r, "%.6f" % theta))
     get_resultant()
+    rescale_graph()
     return
 
 
@@ -52,6 +73,7 @@ root.grid_rowconfigure(1, weight=0)
 
 # Initialize dict[np.array] for vectors and resultant for sum
 vct: dict[np.array] = {}
+vct_plt: dict[plt.arrow] = {}
 resultant = np.array([0,0])
 resultant_x = tk.StringVar(value="0.0000")
 resultant_y = tk.StringVar(value="0.0000")
@@ -60,7 +82,7 @@ resultant_Rtheta = tk.StringVar(value="0.0000")
 
 # Frame/Container for buttons/labels/textboxes/checkboxes
 control_frame = ttk.Frame(root)
-control_frame.grid(column=0, row=0,rowspan=2, sticky='nsew')
+control_frame.grid(column=0, row=0, rowspan=2, sticky='nsew')
 control_frame.grid_columnconfigure(0, weight=1)
 control_frame.grid_columnconfigure(1, weight=0)
 control_frame.grid_rowconfigure(0, weight=0)
@@ -78,10 +100,10 @@ add_vector_frame.grid_rowconfigure(1, weight=0)
 add_vector_frame.grid_rowconfigure(2, weight=0)
 add_vector_frame.grid_rowconfigure(3, weight=0)
 
-name_label = ttk.Label(add_vector_frame, text="Vector name: ")
-name_label.grid(column=0, row=0, sticky="nw", padx=10)
-name_txtbox = ttk.Entry(add_vector_frame)
-name_txtbox.grid(column=1, row=0, columnspan=3, sticky="new", padx=10)
+vector_name_label = ttk.Label(add_vector_frame, text="Vector name: ")
+vector_name_label.grid(column=0, row=0, sticky="nw", padx=10)
+vector_name_txtbox = ttk.Entry(add_vector_frame)
+vector_name_txtbox.grid(column=1, row=0, columnspan=3, sticky="new", padx=10)
 
 requirement1_label = ttk.Label(add_vector_frame, text="X / R : ")
 requirement2_label = ttk.Label(add_vector_frame, text="Y / \u03B8 : ")
@@ -148,10 +170,11 @@ result_Rtheta.grid(column=3, row=1, sticky="nsw", padx=(0,10), pady=10)
 
 # Setup Graph elements
 fig = plt.figure()
-plot = fig.add_subplot()
+plot = plt.subplot()
+fig.add_subplot(plot)
 canvas = FigureCanvasTkAgg(figure=fig, master=root)
 canvas.get_tk_widget().grid(column=2, row=0, sticky='nsew')
-toolbar = NavigationToolbar2Tk(canvas = canvas, window = root, pack_toolbar = False)
+toolbar = NavigationToolbar2Tk(canvas=canvas, window=root, pack_toolbar=False)
 toolbar.grid(column=2, row=1, sticky='sew')
 
 # Set closing sequence
