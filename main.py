@@ -73,7 +73,7 @@ resultant_y = tk.StringVar(value="0.0000")
 
 # Frame/Container for buttons/labels/textboxes/checkboxes
 control_frame = ttk.Frame(root)
-control_frame.grid(column=0, row=0,rowspan=2, sticky='nsew')
+control_frame.grid(column=0, row=0, rowspan=2, sticky='nsew')
 control_frame.grid_columnconfigure(0, weight=1)
 control_frame.grid_columnconfigure(1, weight=0)
 control_frame.grid_rowconfigure(0, weight=0)
