@@ -58,6 +58,9 @@ def add_vector() -> None:
     tree.insert("", "end", vector_name, values=(vector_name, "%.6f" % x, "%.6f" % y, "%.6f" % r, "%.6f" % theta))
     get_resultant()
     rescale_graph()
+    null_vectorname.set(value="")
+    null_requirement1.set(value="")
+    null_requirement2.set(value="")
     return
 
 
@@ -79,6 +82,9 @@ resultant_x = tk.StringVar(value="0.0000")
 resultant_y = tk.StringVar(value="0.0000")
 resultant_Rm = tk.StringVar(value="0.0000")
 resultant_Rtheta = tk.StringVar(value="0.0000")
+null_vectorname = tk.StringVar(value="")
+null_requirement1= tk.StringVar(value="")
+null_requirement2= tk.StringVar(value="")
 
 # Frame/Container for buttons/labels/textboxes/checkboxes
 control_frame = ttk.Frame(root)
@@ -102,15 +108,15 @@ add_vector_frame.grid_rowconfigure(3, weight=0)
 
 vector_name_label = ttk.Label(add_vector_frame, text="Vector name: ")
 vector_name_label.grid(column=0, row=0, sticky="nw", padx=10)
-vector_name_txtbox = ttk.Entry(add_vector_frame)
+vector_name_txtbox = ttk.Entry(add_vector_frame, textvariable=null_vectorname)
 vector_name_txtbox.grid(column=1, row=0, columnspan=3, sticky="new", padx=10)
 
 requirement1_label = ttk.Label(add_vector_frame, text="X / R : ")
 requirement2_label = ttk.Label(add_vector_frame, text="Y / \u03B8 : ")
 requirement1_label.grid(column=0, row=1, sticky="ew", padx=10)
 requirement2_label.grid(column=2, row=1, sticky="ew", padx=10)
-requirement1_txtbox = ttk.Entry(add_vector_frame)
-requirement2_txtbox = ttk.Entry(add_vector_frame)
+requirement1_txtbox = ttk.Entry(add_vector_frame, textvariable=null_requirement1)
+requirement2_txtbox = ttk.Entry(add_vector_frame, textvariable=null_requirement2)
 requirement1_txtbox.grid(column=1, row=1, sticky="ew", padx=10, pady=10)
 requirement2_txtbox.grid(column=3, row=1, sticky="ew", padx=10, pady=10)
 
@@ -171,6 +177,7 @@ result_Rtheta.grid(column=3, row=1, sticky="nsw", padx=(0,10), pady=10)
 # Setup Graph elements
 fig = plt.figure()
 plot = plt.subplot()
+plot.grid()
 fig.add_subplot(plot)
 canvas = FigureCanvasTkAgg(figure=fig, master=root)
 canvas.get_tk_widget().grid(column=2, row=0, sticky='nsew')
