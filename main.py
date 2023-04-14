@@ -24,10 +24,12 @@ def rescale_graph() -> None:
     return
 
 def get_resultant() -> None:
-    global resultant, resultant_x, resultant_y
+    global resultant, resultant_x, resultant_y, resultant_plt
     resultant = sum(vct.values())
     resultant_x.set(value="%.4f" % resultant[0])
     resultant_y.set(value="%.4f" % resultant[1])
+    resultant_plt.remove()
+    resultant_plt = plot.quiver(0, 0, *resultant, color='r', scale=1, scale_units='xy', angles='xy')
     return
 
 def add_vector() -> None:
@@ -71,6 +73,7 @@ root.grid_rowconfigure(1, weight=0)
 vct: dict[np.array] = {}
 vct_plt: dict[plt.arrow] = {}
 resultant = np.array([0,0])
+resultant_plt: plt.quiver
 resultant_x = tk.StringVar(value="0.0000")
 resultant_y = tk.StringVar(value="0.0000")
 
@@ -165,6 +168,9 @@ canvas = FigureCanvasTkAgg(figure=fig, master=root)
 canvas.get_tk_widget().grid(column=2, row=0, sticky='nsew')
 toolbar = NavigationToolbar2Tk(canvas=canvas, window=root, pack_toolbar=False)
 toolbar.grid(column=2, row=1, sticky='sew')
+
+resultant_plt = plot.quiver(0, 0, resultant[0], resultant[1], color='r', scale=1, scale_units='xy', angles='xy')
+rescale_graph()
 
 # Set closing sequence
 root.protocol("WM_DELETE_WINDOW", on_close)
