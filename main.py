@@ -24,10 +24,12 @@ def rescale_graph() -> None:
     return
 
 def get_resultant() -> None:
-    global resultant, resultant_x, resultant_y, resultant_plt
+    global resultant, resultant_x, resultant_y, resultant_Rm, resultant_Rtheta, resultant_plt
     resultant = sum(vct.values())
     resultant_x.set(value="%.4f" % resultant[0])
     resultant_y.set(value="%.4f" % resultant[1])
+    resultant_Rm.set(value="%.4f" % np.hypot(*resultant))
+    resultant_Rtheta.set(value="%.4f" % np.rad2deg(np.arctan2(resultant[1], resultant[0])))
     resultant_plt.remove()
     resultant_plt = plot.quiver(0, 0, *resultant, color='r', scale=1, scale_units='xy', angles='xy')
     return
@@ -76,6 +78,8 @@ resultant = np.array([0,0])
 resultant_plt: plt.quiver
 resultant_x = tk.StringVar(value="0.0000")
 resultant_y = tk.StringVar(value="0.0000")
+resultant_Rm = tk.StringVar(value="0.0000")
+resultant_Rtheta = tk.StringVar(value="0.0000")
 
 # Frame/Container for buttons/labels/textboxes/checkboxes
 control_frame = ttk.Frame(root)
@@ -152,18 +156,27 @@ tree.heading("# 5", text="\u03B8")
 
 result_x_label = ttk.Label(resultant_canvas, text="X = ", background="white")
 result_y_label = ttk.Label(resultant_canvas, text="Y = ", background="white")
-result_x_label.grid(column=0, row=1, sticky="nsw", padx=(10,0), pady=10)
-result_y_label.grid(column=2, row=1, sticky="nsw", pady=10)
+result_Rm_label = ttk.Label(resultant_canvas, text="Rm = ", background="white")
+result_Rtheta_label = ttk.Label(resultant_canvas, text="\u03B8 = ", background="white")
+result_x_label.grid(column=0, row=0, sticky="nsw", padx=(10,0), pady=10)
+result_y_label.grid(column=2, row=0, sticky="nsw", pady=10)
+result_Rm_label.grid(column=4, row=0, sticky="nsw", pady=10)
+result_Rtheta_label.grid(column=6, row=0, sticky="nsw", pady=10)
 
 result_x = ttk.Label(resultant_canvas, textvariable=resultant_x, background="white")
 result_y = ttk.Label(resultant_canvas, textvariable=resultant_y, background="white")
-result_x.grid(column=1, row=1, sticky="nsw", pady=10)
-result_y.grid(column=3, row=1, sticky="nsw", padx=(0,10), pady=10)
+result_Rm = ttk.Label(resultant_canvas, textvariable=resultant_Rm, background="white")
+result_Rtheta = ttk.Label(resultant_canvas, textvariable=resultant_Rtheta, background="white")
+result_x.grid(column=1, row=0, sticky="nsw", pady=10)
+result_y.grid(column=3, row=0, sticky="nsw", pady=10)
+result_Rm.grid(column=5, row=0, sticky="nsw", pady=10)
+result_Rtheta.grid(column=7, row=0, sticky="nsw", padx=(0,10), pady=10)
 
 # Setup Graph elements
 fig = plt.figure()
 plot = plt.subplot()
 fig.add_subplot(plot)
+plot.grid()
 canvas = FigureCanvasTkAgg(figure=fig, master=root)
 canvas.get_tk_widget().grid(column=2, row=0, sticky='nsew')
 toolbar = NavigationToolbar2Tk(canvas=canvas, window=root, pack_toolbar=False)
