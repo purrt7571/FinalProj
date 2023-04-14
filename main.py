@@ -20,7 +20,7 @@ def rescale_graph() -> None:
     y_min, y_max = np.floor(min(*y, 0)) - 1, np.ceil(max(*y, 0)) + 1
     plot.set_xlim(x_min, x_max)
     plot.set_ylim(y_min, y_max)
-    canvas.draw()
+    canvas.draw_idle()
     return
 
 def get_resultant() -> None:
@@ -159,17 +159,17 @@ result_Rm_label = ttk.Label(resultant_canvas, text="Rm = ", background="white")
 result_Rtheta_label = ttk.Label(resultant_canvas, text="\u03B8 = ", background="white")
 result_x_label.grid(column=0, row=0, sticky="nsw", padx=(10,0), pady=10)
 result_y_label.grid(column=2, row=0, sticky="nsw", pady=10)
-result_Rm_label.grid(column=0, row=1, sticky="nsw", padx=(10,0), pady=10)
-result_Rtheta_label.grid(column=2, row=1, sticky="nsw", pady=10)
+result_Rm_label.grid(column=4, row=0, sticky="nsw", pady=10)
+result_Rtheta_label.grid(column=6, row=0, sticky="nsw", pady=10)
 
 result_x = ttk.Label(resultant_canvas, textvariable=resultant_x, background="white")
 result_y = ttk.Label(resultant_canvas, textvariable=resultant_y, background="white")
 result_Rm = ttk.Label(resultant_canvas, textvariable=resultant_Rm, background="white")
 result_Rtheta = ttk.Label(resultant_canvas, textvariable=resultant_Rtheta, background="white")
 result_x.grid(column=1, row=0, sticky="nsw", pady=10)
-result_y.grid(column=3, row=0, sticky="nsw", padx=(0,10), pady=10)
-result_Rm.grid(column=1, row=1, sticky="nsw", pady=10)
-result_Rtheta.grid(column=3, row=1, sticky="nsw", padx=(0,10), pady=10)
+result_y.grid(column=3, row=0, sticky="nsw", pady=10)
+result_Rm.grid(column=5, row=0, sticky="nsw", pady=10)
+result_Rtheta.grid(column=7, row=0, sticky="nsw", padx=(0,10), pady=10)
 
 # Setup Graph elements
 fig = plt.figure()
