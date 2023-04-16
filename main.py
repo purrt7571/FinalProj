@@ -19,9 +19,8 @@ class BaseWindow(tk.Toplevel):
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=0)
 
-        self.protocol("WM_DELETE_WINDOW", self.close)
-
         self.Base_Widgets()
+        self.protocol("WM_DELETE_WINDOW", self.close)
         return
     
     def Base_Widgets(self) -> None:
