@@ -72,9 +72,9 @@ root.grid_rowconfigure(0, weight=1)
 root.grid_rowconfigure(1, weight=0)
 
 # Initialize dict[np.array] for vectors and resultant for sum
-vct: dict[np.array] = {}
-vct_plt: dict[plt.arrow] = {}
-resultant = np.array([0,0])
+vct: dict[str, np.ndarray] = {}
+vct_plt: dict[str, plt.arrow] = {}
+resultant: np.ndarray = np.array([0,0])
 resultant_plt: plt.quiver
 resultant_x = tk.StringVar(value="0.0000")
 resultant_y = tk.StringVar(value="0.0000")
