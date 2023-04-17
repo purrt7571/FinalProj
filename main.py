@@ -10,6 +10,7 @@ from tkinter.messagebox import showerror
 class BaseWindow(tk.Toplevel):
     
     def __init__(self, master: tk.Tk, minwidth: int = 1500, minheight: int = 900) -> None:
+
         super().__init__(master = master)
         self.title("VectorSim")
         self.minsize(minwidth, minheight)
@@ -18,6 +19,10 @@ class BaseWindow(tk.Toplevel):
         self.grid_columnconfigure(2, weight=3)
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=0)
+
+        self.name_var: tk.StringVar = tk.StringVar(self)
+        self.req1_var: tk.StringVar = tk.StringVar(self)
+        self.req2_var: tk.StringVar = tk.StringVar(self)
 
         self.resultant_vct: np.ndarray = np.array([0,0])
         self.resultant_xvar: tk.StringVar = tk.StringVar(self, "0.0000")
@@ -29,6 +34,24 @@ class BaseWindow(tk.Toplevel):
         self.control_panel = tk.Frame(self)
         self.control_panel.grid(column = 0, row = 0, rowspan = 2, sticky = "nsew")
         self.control_panel.grid_columnconfigure(0, weight = 1)
+        
+        self.vector_frame = ttk.Labelframe(self.control_panel, text = "Vector")
+        self.vector_frame.grid(column = 0, row = 0, sticky = "new", padx = 10, pady = 10)
+        self.vector_frame.grid_columnconfigure(0,weight=1)
+        self.vector_frame.grid_columnconfigure(1,weight=3)
+        self.vector_frame.grid_columnconfigure(2,weight=1)
+        self.vector_frame.grid_columnconfigure(3,weight=3)
+        self.vector_frame.grid_rowconfigure(0, weight=0)
+        self.vector_frame.grid_rowconfigure(1, weight=0)
+        self.vector_frame.grid_rowconfigure(2, weight=0)
+        self.vector_frame.grid_rowconfigure(3, weight=0)
+
+        ttk.Label(self.vector_frame, text = "Vector name: ").grid(column = 0, row = 0, sticky = "nw", padx = 10)
+        ttk.Label(self.vector_frame, text="X / R : ").grid(column=0, row=1, sticky="ew", padx=10)
+        ttk.Label(self.vector_frame, text="Y / \u03B8 : ").grid(column=2, row=1, sticky="ew", padx=10)
+        ttk.Entry(self.vector_frame, textvariable = self.name_var).grid(column = 1, row = 0, columnspan = 3, sticky = "new", padx = 10)
+        ttk.Entry(self.vector_frame, textvariable = self.req1_var).grid(column = 1, row = 1, sticky = "ew", padx = 10, pady = 10)
+        ttk.Entry(self.vector_frame, textvariable = self.req2_var).grid(column = 3, row = 1, sticky = "ew", padx = 10, pady = 10)
 
         self.tree = ttk.Treeview(master = self, columns = ("name", "x", "y", "rm", "rtheta"), show = "headings")
         self.tree.grid(column = 1, row = 0, sticky = "nsew")
@@ -76,9 +99,11 @@ class BaseWindow(tk.Toplevel):
         return
     
     def close(self) -> None:
+
         self.canvas.close_event()
         self.destroy()
         return
+
 
 root = HdpiTk()
 root.grid_columnconfigure(0, weight = 1)
