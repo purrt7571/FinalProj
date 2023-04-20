@@ -8,6 +8,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.quiver import Quiver
 from tkinter.messagebox import showerror
 
+        
 class BaseWindow(tk.Toplevel):
     """
     Base window for each case with a control panel, table, resultant, and graphing plane.
@@ -54,9 +55,14 @@ class BaseWindow(tk.Toplevel):
         ttk.Label(self.vector_frame, text = "Vector name: ").grid(column = 0, row = 0, sticky = "nw", padx = 10)
         ttk.Label(self.vector_frame, text="X / R : ").grid(column=0, row=1, sticky="ew", padx=10)
         ttk.Label(self.vector_frame, text="Y / \u03B8 : ").grid(column=2, row=1, sticky="ew", padx=10)
-        ttk.Entry(self.vector_frame, textvariable = self.name_var).grid(column = 1, row = 0, columnspan = 3, sticky = "new", padx = 10)
-        ttk.Entry(self.vector_frame, textvariable = self.req1_var).grid(column = 1, row = 1, sticky = "ew", padx = 10, pady = 10)
-        ttk.Entry(self.vector_frame, textvariable = self.req2_var).grid(column = 3, row = 1, sticky = "ew", padx = 10, pady = 10)
+
+        self.name_entry = ttk.Entry(self.vector_frame, textvariable = self.name_var)
+        self.name_entry.grid(column = 1, row = 0, columnspan = 3, sticky = "new", padx = 10)
+        self.req1_entry = ttk.Entry(self.vector_frame, textvariable = self.req1_var)
+        self.req1_entry.grid(column = 1, row = 1, sticky = "ew", padx = 10, pady = 10)
+        self.req2_entry = ttk.Entry(self.vector_frame, textvariable = self.req2_var)
+        self.req2_entry.grid(column = 3, row = 1, sticky = "ew", padx = 10, pady = 10)
+
         ttk.Radiobutton(self.vector_frame, text = "X and Y components", variable = self.coordinate, value = 0).grid(column = 0, row = 2, columnspan = 2, sticky = "ew", padx = 10, pady = 10)
         ttk.Radiobutton(self.vector_frame, text = "Magnitude and Direction", variable = self.coordinate, value = 1).grid(column = 2, row = 2, columnspan = 2, sticky = "ew", padx = 10, pady = 10)
         ttk.Button(self.vector_frame, text = "Add Vector", command = self.add_vector).grid(column=0, row=3, columnspan=4, sticky="ew", pady=(5,10), padx=10)
@@ -118,24 +124,57 @@ class BaseWindow(tk.Toplevel):
         vector_name = self.name_var.get()
 
         if vector_name == "":
+
             showerror("Error", "Vector name is empty!")
+            self.name_entry.focus_set()
             return
+        
         elif vector_name in self.quiver_dict:
+
             showerror("Error", f"Vector \"{vector_name}\" already exists!")
+            self.name_entry.focus_set()
             return
+        
         elif self.coordinate.get():
-            r = float(self.req1_var.get())
-            theta = float(self.req2_var.get())
+
+            try:
+                r = float(self.req1_var.get())
+            except ValueError:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.req1_entry.focus_set()
+                return
+            
+            try:
+                theta = float(self.req2_var.get())
+            except ValueError:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.req2_entry.focus_set()
+                return
+            
             x = r * np.cos(np.radians(theta))
             y = r * np.sin(np.radians(theta))
+
         else:
-            x = float(self.req1_var.get())
-            y = float(self.req2_var.get())
+
+            try:
+                x = float(self.req1_var.get())
+            except ValueError as e:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.req1_entry.focus_set()
+                return
+            
+            try:
+                y = float(self.req2_var.get())
+            except ValueError as e:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.req2_entry.focus_set()
+                return
+
             r = np.hypot(x,y)
             theta = np.rad2deg(np.arctan2(y, x))
         
         self.vector_dict[vector_name] = np.array([x, y])
-        self.quiver_dict[vector_name] = self.plot.quiver(x, y, alpha = 0.2, color = "g", scale = 1, scale_units = "xy", angles = "xy") # Need to change
+        self.quiver_dict[vector_name] = self.plot.quiver(x, y, alpha = 0.5, color = "g", scale = 1, scale_units = "xy", angles = "xy") # Need to change
         self.tree.insert("", "end", vector_name, values = (vector_name, "%.6f" % x, "%.6f" % y, "%.6f" % r, "%.6f" % theta))
 
         self.get_resultant()
@@ -179,6 +218,7 @@ class BaseWindow(tk.Toplevel):
     def close(self) -> None:
 
         self.canvas.callbacks.process('close_event')
+        self.master.focus_set()
         self.destroy()
         return
 
