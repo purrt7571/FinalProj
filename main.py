@@ -95,9 +95,9 @@ class BaseWindow(tk.Toplevel):
         ttk.Label(self.resultant_canvas, textvariable = self.resultant_rvar).grid(column = 5, row = 0, sticky = "nsw", pady = 10)
         ttk.Label(self.resultant_canvas, textvariable = self.resultant_thetavar).grid(column = 7, row = 0, sticky = "nsw", pady = 10)
 
-        self.fig = Figure(figsize=(4,5))
+        self.fig = Figure()
         self.plot = self.fig.subplots()
-        self.plot.set_aspect("equal", "box")
+        self.plot.set_aspect("equal")
         self.plot.set_box_aspect(1.25)
         self.plot.grid()
         self.canvas = FigureCanvasTkAgg(figure = self.fig, master = self)
