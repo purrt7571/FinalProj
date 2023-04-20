@@ -5,8 +5,8 @@ from hdpitkinter import HdpiTk
 from matplotlib.figure import Figure
 from matplotlib.backends._backend_tk import NavigationToolbar2Tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.quiver import Quiver
 from tkinter.messagebox import showerror
-from typing import Any
 
 class BaseWindow(tk.Toplevel):
     """
@@ -28,14 +28,13 @@ class BaseWindow(tk.Toplevel):
         self.req2_var: tk.StringVar = tk.StringVar(self)
         self.coordinate: tk.IntVar = tk.IntVar(self, value = 0)
         self.vector_dict: dict[str, np.ndarray] = {}
-        self.quiver_dict: dict[str, Any] = {}
+        self.quiver_dict: dict[str, Quiver] = {}
 
         self.resultant_vct: np.ndarray = np.array([0,0])
         self.resultant_xvar: tk.StringVar = tk.StringVar(self, "0.0000")
         self.resultant_yvar: tk.StringVar = tk.StringVar(self, "0.0000")
         self.resultant_rvar: tk.StringVar = tk.StringVar(self, "0.0000")
         self.resultant_thetavar: tk.StringVar = tk.StringVar(self, "0.0000")
-        self.resultant_plot: None = None
 
         self.control_panel = tk.Frame(self)
         self.control_panel.grid(column = 0, row = 0, rowspan = 2, sticky = "nsew")
@@ -96,15 +95,20 @@ class BaseWindow(tk.Toplevel):
         ttk.Label(self.resultant_canvas, textvariable = self.resultant_rvar).grid(column = 5, row = 0, sticky = "nsw", pady = 10)
         ttk.Label(self.resultant_canvas, textvariable = self.resultant_thetavar).grid(column = 7, row = 0, sticky = "nsw", pady = 10)
 
-        self.fig = Figure(figsize = (4, 5))
+        self.fig = Figure(figsize=(4,5))
         self.plot = self.fig.subplots()
+        self.plot.set_aspect("equal", "box")
+        self.plot.set_box_aspect(1.25)
         self.plot.grid()
         self.canvas = FigureCanvasTkAgg(figure = self.fig, master = self)
         self.canvas.get_tk_widget().grid(column = 2, row = 0, sticky = "nsew")
         self.toolbar = NavigationToolbar2Tk(self.canvas, self, pack_toolbar = False)
         self.toolbar.grid(column = 2, row = 1, sticky = "sew")
+
+        self.resultant_plot: Quiver = self.plot.quiver(0, 0, color = "black", scale = 1, scale_units = "xy", angles = "xy")
         
         self.protocol("WM_DELETE_WINDOW", self.close)
+        self.rescale_graph()
         return
     
     def add_vector(self) -> None:
@@ -131,15 +135,50 @@ class BaseWindow(tk.Toplevel):
             theta = np.rad2deg(np.arctan2(y, x))
         
         self.vector_dict[vector_name] = np.array([x, y])
-        self.quiver_dict[vector_name] = self.plot.quiver(x, y, alpha = 0.2, color = "g") # Need to change
+        self.quiver_dict[vector_name] = self.plot.quiver(x, y, alpha = 0.2, color = "g", scale = 1, scale_units = "xy", angles = "xy") # Need to change
         self.tree.insert("", "end", vector_name, values = (vector_name, "%.6f" % x, "%.6f" % y, "%.6f" % r, "%.6f" % theta))
+
+        self.get_resultant()
+        self.rescale_graph()
+        return
+    
+    def get_resultant(self) -> None:
+
+        self.resultant_vct = sum(self.vector_dict.values()) # type: ignore
+        self.resultant_xvar.set(value = "%.4f" % self.resultant_vct[0]) # type: ignore
+        self.resultant_yvar.set(value = "%.4f" % self.resultant_vct[1]) # type: ignore
+        self.resultant_rvar.set(value = "%.4f" % np.hypot(*self.resultant_vct))
+        self.resultant_thetavar.set(value = "%.4f" % np.rad2deg(np.arctan2(self.resultant_vct[1], self.resultant_vct[0]))) # type: ignore
+        self.resultant_plot.remove()
+        self.resultant_plot = self.plot.quiver(*self.resultant_vct, color = "black", scale = 1, scale_units = "xy", angles = "xy") # type: ignore
+        return
+    
+    def rescale_graph(self) -> None:
+
+        x = [i[0] for i in self.vector_dict.values()] + [self.resultant_vct[0]]
+        y = [i[1] for i in self.vector_dict.values()] + [self.resultant_vct[1]]   
+
+        x_min, x_max = np.floor(min(*x, 0)) - 1, np.ceil(max(*x, 0)) + 1
+        y_min, y_max = np.floor(min(*y, 0)) - 1, np.ceil(max(*y, 0)) + 1
+        x_mid = (x_min + x_max) / 2
+        y_mid = (y_min + y_max) / 2
+        x_range = x_max - x_min
+        y_range = y_max - y_min
+
+        if 1.25 * x_range > y_range:
+            self.plot.set_xlim(x_mid - x_range / 2, x_mid + x_range / 2)
+            self.plot.set_ylim(y_mid - x_range / 2 * 1.25, y_mid + x_range / 2 * 1.25)
+        else:
+            self.plot.set_xlim(x_mid - y_range / 2 / 1.25, x_mid + y_range / 2 / 1.25)
+            self.plot.set_ylim(y_mid - y_range / 2, y_mid + y_range / 2)
 
         self.canvas.draw()
         return
+        
     
     def close(self) -> None:
 
-        self.canvas.close_event()
+        self.canvas.callbacks.process('close_event')
         self.destroy()
         return
 
