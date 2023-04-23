@@ -236,6 +236,7 @@ class Case_2(tk.Toplevel):
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=0)
 
+        # Variables for the Given Vectors
         self.given_name_var: tk.StringVar = tk.StringVar(self)
         self.given_req1_var: tk.StringVar = tk.StringVar(self)
         self.given_req2_var: tk.StringVar = tk.StringVar(self)
@@ -244,13 +245,18 @@ class Case_2(tk.Toplevel):
         self.quiver_dict: dict[str, Quiver] = {}
         self.sum_given_vct: np.ndarray = np.array([0,0])
 
+        # Variables for the Resultant Vector
         self.resultant_name_var: tk.StringVar = tk.StringVar(self)
         self.resultant_req1_var: tk.StringVar = tk.StringVar(self)
         self.resultant_req2_var: tk.StringVar = tk.StringVar(self)
         self.resultant_coordinate: tk.IntVar = tk.IntVar(self, value = 0)
+        self.resultant_xvar: tk.StringVar = tk.StringVar(self, "0.0000")
+        self.resultant_yvar: tk.StringVar = tk.StringVar(self, "0.0000")
+        self.resultant_vct_var: tk.StringVar = tk.StringVar(self, "0.0000")
+        self.resultant_thetavar: tk.StringVar = tk.StringVar(self, "0.0000")
         self.resultant_vct: np.ndarray = np.array([])
 
-
+        # Variables for the Missing Vector
         self.missing_xvar: tk.StringVar = tk.StringVar(self, "0.0000")
         self.missing_yvar: tk.StringVar = tk.StringVar(self, "0.0000")
         self.missing_vct_var: tk.StringVar = tk.StringVar(self, "0.0000")
@@ -262,9 +268,10 @@ class Case_2(tk.Toplevel):
         self.control_panel.grid_columnconfigure(0, weight = 1)
         self.control_panel.grid_rowconfigure(0, weight = 0)
         self.control_panel.grid_rowconfigure(1, weight = 0)
+        self.control_panel.grid_rowconfigure(2, weight = 0)
         
         # Given Vector Widget
-        self.given_vector_frame = ttk.Labelframe(self.control_panel, text = "Given Vector")
+        self.given_vector_frame = ttk.Labelframe(self.control_panel, text = "Given Vector (Green)")
         self.given_vector_frame.grid(column = 0, row = 0, sticky = "new", padx = 10, pady = 10)
         self.given_vector_frame.grid_columnconfigure(0,weight=1)
         self.given_vector_frame.grid_columnconfigure(1,weight=3)
@@ -291,7 +298,7 @@ class Case_2(tk.Toplevel):
         ttk.Button(self.given_vector_frame, text = "Add Vector", command = self.add_given_vector).grid(column=0, row=3, columnspan=4, sticky="ew", pady=(5,10), padx=10)
 
         # Resultant Vector Widget
-        self.resultant_vector_frame = ttk.Labelframe(self.control_panel, text = "Resultant Vector")
+        self.resultant_vector_frame = ttk.Labelframe(self.control_panel, text = "Resultant Vector (Black)")
         self.resultant_vector_frame.grid(column = 0, row = 1, sticky = "new", padx = 10, pady = 10)
         self.resultant_vector_frame.grid_columnconfigure(0,weight=1)
         self.resultant_vector_frame.grid_columnconfigure(1,weight=3)
@@ -316,6 +323,29 @@ class Case_2(tk.Toplevel):
         ttk.Radiobutton(self.resultant_vector_frame, text = "X and Y components", variable = self.resultant_coordinate, value = 0).grid(column = 0, row = 2, columnspan = 2, sticky = "ew", padx = 10, pady = 10)
         ttk.Radiobutton(self.resultant_vector_frame, text = "Magnitude and Direction", variable = self.resultant_coordinate, value = 1).grid(column = 2, row = 2, columnspan = 2, sticky = "ew", padx = 10, pady = 10)
         ttk.Button(self.resultant_vector_frame, text = "Add Vector", command = self.add_resultant_vector).grid(column=0, row=3, columnspan=4, sticky="ew", pady=(5,10), padx=10)
+
+        # Missing Vector Widget
+        self.missing_vector_frame = ttk.Labelframe(self.control_panel, text = "Missing Vector (Red)")
+        self.missing_vector_frame.grid(column = 0, row = 2, sticky = "new", padx = 10, pady = 10)
+        self.missing_vector_frame.grid_columnconfigure(0,weight=1)
+        self.missing_vector_frame.grid_columnconfigure(1,weight=3)
+        self.missing_vector_frame.grid_columnconfigure(2,weight=1)
+        self.missing_vector_frame.grid_columnconfigure(3,weight=3)
+        self.missing_vector_frame.grid_rowconfigure(0, weight=0)
+        self.missing_vector_frame.grid_rowconfigure(1, weight=0)
+        self.missing_vector_frame.grid_rowconfigure(2, weight=0)
+        self.missing_vector_frame.grid_rowconfigure(3, weight=0)
+
+        ttk.Label(self.missing_vector_frame, text = "X-Component = ").grid(column = 0, row = 0, sticky = "nw", padx = 10)
+        ttk.Label(self.missing_vector_frame, textvariable = self.missing_xvar).grid(column = 1, row = 0, sticky = "nw", padx = 10)
+        ttk.Label(self.missing_vector_frame, text = "Y-Component = ").grid(column = 0, row = 1, sticky = "nw", padx = 10)
+        ttk.Label(self.missing_vector_frame, textvariable = self.missing_yvar).grid(column = 1, row = 1, sticky = "nw", padx = 10)
+        ttk.Label(self.missing_vector_frame, text = "Magnitude = ").grid(column = 2, row = 0, sticky = "nw", padx = 10)
+        ttk.Label(self.missing_vector_frame, textvariable = self.missing_vct_var).grid(column = 3, row = 0, sticky = "nw", padx = 10)
+        ttk.Label(self.missing_vector_frame, text = "Direction (\u03B8) = ").grid(column = 2, row = 1, sticky = "nw", padx = 10)
+        ttk.Label(self.missing_vector_frame, textvariable = self.missing_thetavar).grid(column = 3, row = 1, sticky = "nw", padx = 10)
+
+
 
         self.tree = ttk.Treeview(master = self, columns = ("name", "x", "y", "rm", "rtheta"), show = "headings")
         self.tree.grid(column = 1, row = 0, sticky = "nsew")
@@ -346,10 +376,10 @@ class Case_2(tk.Toplevel):
         ttk.Label(self.resultant_canvas, text = "Y = ").grid(column = 2, row = 0, sticky = "nsw", pady = 10)
         ttk.Label(self.resultant_canvas, text = "R = ").grid(column = 4, row = 0, sticky = "nsw", pady = 10)
         ttk.Label(self.resultant_canvas, text = "\u03B8 = ").grid(column = 6, row = 0, sticky = "nsw", pady = 10)
-        ttk.Label(self.resultant_canvas, textvariable = self.missing_xvar).grid(column = 1, row = 0, sticky = "nsw", pady = 10)
-        ttk.Label(self.resultant_canvas, textvariable = self.missing_yvar).grid(column = 3, row = 0, sticky = "nsw", pady = 10)
-        ttk.Label(self.resultant_canvas, textvariable = self.missing_vct_var).grid(column = 5, row = 0, sticky = "nsw", pady = 10)
-        ttk.Label(self.resultant_canvas, textvariable = self.missing_thetavar).grid(column = 7, row = 0, sticky = "nsw", pady = 10)
+        ttk.Label(self.resultant_canvas, textvariable = self.resultant_xvar).grid(column = 1, row = 0, sticky = "nsw", pady = 10)
+        ttk.Label(self.resultant_canvas, textvariable = self.resultant_yvar).grid(column = 3, row = 0, sticky = "nsw", pady = 10)
+        ttk.Label(self.resultant_canvas, textvariable = self.resultant_vct_var).grid(column = 5, row = 0, sticky = "nsw", pady = 10)
+        ttk.Label(self.resultant_canvas, textvariable = self.resultant_thetavar).grid(column = 7, row = 0, sticky = "nsw", pady = 10)
 
         self.fig = Figure()
         self.plot = self.fig.subplots()
@@ -490,6 +520,10 @@ class Case_2(tk.Toplevel):
                 theta = np.rad2deg(np.arctan2(y, x))
             
             self.resultant_vct = np.array([x,y])
+            self.resultant_xvar.set(value = "%.4f" % self.resultant_vct[0]) # type: ignore
+            self.resultant_yvar.set(value = "%.4f" % self.resultant_vct[1]) # type: ignore
+            self.resultant_vct_var.set(value = "%.4f" % np.hypot(self.resultant_vct[0], self.resultant_vct[1]))
+            self.resultant_thetavar.set(value = "%.4f" % np.rad2deg(np.arctan2(self.resultant_vct[1], self.resultant_vct[0])))
             self.tree.insert("", "end", resultant_vector_name, values = (resultant_vector_name, "%.6f" % x, "%.6f" % y, "%.6f" % r, "%.6f" % theta))
             self.resultant_plot = self.plot.quiver(*self.resultant_vct, color = "black", scale = 1, scale_units = "xy", angles = "xy") # type: ignore
 
