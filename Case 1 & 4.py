@@ -454,6 +454,7 @@ class Case_2(tk.Toplevel):
             r = np.hypot(x,y)
             theta = np.rad2deg(np.arctan2(y, x))
         
+        
         self.vector_dict[given_vector_name] = np.array([x, y])
         self.quiver_dict[given_vector_name] = self.plot.quiver(x, y, alpha = 0.5, color = "g", scale = 1, scale_units = "xy", angles = "xy") # Need to change
         self.tree.insert("", "end", given_vector_name, values = (given_vector_name, "%.6f" % x, "%.6f" % y, "%.6f" % r, "%.6f" % theta))
@@ -559,8 +560,14 @@ class Case_2(tk.Toplevel):
             y = [i[1] for i in self.vector_dict.values()] + [self.sum_given_vct[1]] 
 
         else:
-            x = [i[0] for i in self.vector_dict.values()] + [self.sum_given_vct[0]] + [self.resultant_vct[0]] + [self.missing_vct[0]]
-            y = [i[1] for i in self.vector_dict.values()] + [self.sum_given_vct[1]] + [self.resultant_vct[1]] + [self.missing_vct[1]] 
+            if self.vector_dict:
+                x = [i[0] for i in self.vector_dict.values()] + [self.sum_given_vct[0]] + [self.resultant_vct[0]] + [self.missing_vct[0]]
+                y = [i[1] for i in self.vector_dict.values()] + [self.sum_given_vct[1]] + [self.resultant_vct[1]] + [self.missing_vct[1]] 
+
+            else:
+                x = [i[0] for i in self.vector_dict.values()] + [self.resultant_vct[0]]
+                y = [i[1] for i in self.vector_dict.values()] + [self.resultant_vct[1]] 
+
 
         x_min, x_max = np.floor(min(*x, 0)) - 1, np.ceil(max(*x, 0)) + 1
         y_min, y_max = np.floor(min(*y, 0)) - 1, np.ceil(max(*y, 0)) + 1
