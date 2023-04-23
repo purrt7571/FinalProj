@@ -525,7 +525,6 @@ class Case_2(tk.Toplevel):
             self.resultant_yvar.set(value = "%.4f" % self.resultant_vct[1]) # type: ignore
             self.resultant_vct_var.set(value = "%.4f" % np.hypot(self.resultant_vct[0], self.resultant_vct[1]))
             self.resultant_thetavar.set(value = "%.4f" % np.rad2deg(np.arctan2(self.resultant_vct[1], self.resultant_vct[0])))
-            self.tree.insert("", "end", resultant_vector_name, values = (resultant_vector_name, "%.6f" % x, "%.6f" % y, "%.6f" % r, "%.6f" % theta))
             self.resultant_plot = self.plot.quiver(*self.resultant_vct, color = "black", scale = 1, scale_units = "xy", angles = "xy") # type: ignore
 
             self.get_missing_vct()
