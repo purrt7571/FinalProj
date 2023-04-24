@@ -269,6 +269,8 @@ class Case_2(tk.Toplevel):
         self.control_panel.grid_rowconfigure(0, weight = 0)
         self.control_panel.grid_rowconfigure(1, weight = 0)
         self.control_panel.grid_rowconfigure(2, weight = 0)
+        self.control_panel.grid_rowconfigure(3, weight = 0)
+
         
         # Given Vector Widget
         self.given_vector_frame = ttk.Labelframe(self.control_panel, text = "Given Vector (Green)")
@@ -281,6 +283,8 @@ class Case_2(tk.Toplevel):
         self.given_vector_frame.grid_rowconfigure(1, weight=0)
         self.given_vector_frame.grid_rowconfigure(2, weight=0)
         self.given_vector_frame.grid_rowconfigure(3, weight=0)
+        self.given_vector_frame.grid_rowconfigure(4, weight=0)
+        self.given_vector_frame.grid_rowconfigure(5, weight=0)
 
         ttk.Label(self.given_vector_frame, text = "Vector name: ").grid(column = 0, row = 0, sticky = "nw", padx = 10)
         ttk.Label(self.given_vector_frame, text="X / R : ").grid(column=0, row=1, sticky="ew", padx=10)
@@ -295,7 +299,10 @@ class Case_2(tk.Toplevel):
 
         ttk.Radiobutton(self.given_vector_frame, text = "X and Y components", variable = self.given_coordinate, value = 0).grid(column = 0, row = 2, columnspan = 2, sticky = "ew", padx = 10, pady = 10)
         ttk.Radiobutton(self.given_vector_frame, text = "Magnitude and Direction", variable = self.given_coordinate, value = 1).grid(column = 2, row = 2, columnspan = 2, sticky = "ew", padx = 10, pady = 10)
-        ttk.Button(self.given_vector_frame, text = "Add Vector", command = self.add_given_vector).grid(column=0, row=3, columnspan=4, sticky="ew", pady=(5,10), padx=10)
+        ttk.Button(self.given_vector_frame, text = "Add Vector", command = self.add_given_vector).grid(column=0, row=3, columnspan=4, sticky="ew", pady=5, padx=10)
+
+        self.remove_selected = ttk.Button(self.given_vector_frame, text = "Remove Selected Vectors", command = self.remove_selected_given).grid(column = 0, row = 4, columnspan=4, sticky="ew", padx=10, pady = 5)
+        self.remove_all = ttk.Button(self.given_vector_frame, text = "Remove All Vectors", command = self.remove_all_given).grid(column = 0, row = 5, columnspan=4, sticky="ew", padx=10, pady = 5)
 
         # Resultant Vector Widget
         self.resultant_vector_frame = ttk.Labelframe(self.control_panel, text = "Resultant Vector (Black)")
@@ -344,8 +351,6 @@ class Case_2(tk.Toplevel):
         ttk.Label(self.missing_vector_frame, textvariable = self.missing_vct_var).grid(column = 3, row = 0, sticky = "nw", padx = 10)
         ttk.Label(self.missing_vector_frame, text = "Direction (\u03B8) = ").grid(column = 2, row = 1, sticky = "nw", padx = 10)
         ttk.Label(self.missing_vector_frame, textvariable = self.missing_thetavar).grid(column = 3, row = 1, sticky = "nw", padx = 10)
-
-
 
         self.tree = ttk.Treeview(master = self, columns = ("name", "x", "y", "rm", "rtheta"), show = "headings")
         self.tree.grid(column = 1, row = 0, sticky = "nsew")
@@ -459,9 +464,41 @@ class Case_2(tk.Toplevel):
         self.quiver_dict[given_vector_name] = self.plot.quiver(x, y, alpha = 0.5, color = "g", scale = 1, scale_units = "xy", angles = "xy") # Need to change
         self.tree.insert("", "end", given_vector_name, values = (given_vector_name, "%.6f" % x, "%.6f" % y, "%.6f" % r, "%.6f" % theta))
 
+        self.given_name_entry.delete(0, "end")
+        self.given_req1_entry.delete(0, "end")
+        self.given_req2_entry.delete(0, "end")
+
         self.get_missing_vct()
         self.rescale_graph()
         return
+
+    def remove_selected_given(self) -> None:
+        selected_vector = self.tree.selection()
+        for select in selected_vector:
+            self.vector_dict.pop(select)
+            self.quiver_dict[select].remove()
+            self.quiver_dict.pop(select)
+            self.tree.delete(select)
+
+        if self.vector_dict:
+            pass
+        else:
+            self.resultant_plot.remove()
+            self.missing_vct_plot.remove()
+            self.resultant_vct = np.array([])
+            self.missing_vct = np.array([])
+
+        # need ayusin since hindi nagrereset ang mga numbers
+
+        print(self.vector_dict)
+        print(self.quiver_dict)
+
+        self.get_missing_vct()
+        self.rescale_graph()
+        return
+    
+    def remove_all_given(self) -> None:
+        pass
 
     def add_resultant_vector(self) -> None:
         """
@@ -472,12 +509,6 @@ class Case_2(tk.Toplevel):
         if resultant_vector_name == "":
 
             showerror("Error", "Vector name is empty!")
-            self.resultant_name_entry.focus_set()
-            return
-        
-        elif np.any(self.resultant_vct) == True:
-
-            showerror("Error", f"There should only be one resultant vector.")
             self.resultant_name_entry.focus_set()
             return
         
@@ -524,12 +555,37 @@ class Case_2(tk.Toplevel):
         self.resultant_yvar.set(value = "%.4f" % self.resultant_vct[1]) # type: ignore
         self.resultant_vct_var.set(value = "%.4f" % np.hypot(self.resultant_vct[0], self.resultant_vct[1]))
         self.resultant_thetavar.set(value = "%.4f" % np.rad2deg(np.arctan2(self.resultant_vct[1], self.resultant_vct[0])))
+        self.resultant_plot.remove()
         self.resultant_plot = self.plot.quiver(*self.resultant_vct, color = "black", scale = 1, scale_units = "xy", angles = "xy") # type: ignore
+
+        self.resultant_name_entry = ttk.Label(self.resultant_vector_frame, textvariable = self.resultant_name_var)
+        self.resultant_name_entry.grid(column = 1, row = 0, columnspan = 3, sticky = "new", padx = 10)
+        self.resultant_req1_entry = ttk.Label(self.resultant_vector_frame, textvariable = self.resultant_req1_var)
+        self.resultant_req1_entry.grid(column = 1, row = 1, sticky = "ew", padx = 10, pady = 10)
+        self.resultant_req2_entry = ttk.Label(self.resultant_vector_frame, textvariable = self.resultant_req2_var)
+        self.resultant_req2_entry.grid(column = 3, row = 1, sticky = "ew", padx = 10, pady = 10)
+        ttk.Button(self.resultant_vector_frame, text = "Edit Vector", command = self.edit_resultant_vector).grid(column=0, row=3, columnspan=4, sticky="ew", pady=(5,10), padx=10)
+
 
         self.get_missing_vct()
         self.rescale_graph()
+
+
         return
+        
+    def edit_resultant_vector(self) -> None:
+            self.resultant_name_entry = ttk.Entry(self.resultant_vector_frame, textvariable = self.resultant_name_var)
+            self.resultant_name_entry.grid(column = 1, row = 0, columnspan = 3, sticky = "new", padx = 10)
+            self.resultant_req1_entry = ttk.Entry(self.resultant_vector_frame, textvariable = self.resultant_req1_var)
+            self.resultant_req1_entry.grid(column = 1, row = 1, sticky = "ew", padx = 10, pady = 10)
+            self.resultant_req2_entry = ttk.Entry(self.resultant_vector_frame, textvariable = self.resultant_req2_var)
+            self.resultant_req2_entry.grid(column = 3, row = 1, sticky = "ew", padx = 10, pady = 10)
+            ttk.Button(self.resultant_vector_frame, text = "Save", command = self.add_resultant_vector).grid(column=0, row=3, columnspan=4, sticky="ew", pady=(5,10), padx=10)
             
+            self.get_missing_vct()
+            self.rescale_graph()
+
+
     def get_missing_vct(self) -> None:
         if np.any(self.resultant_vct) == True:
             if len(self.vector_dict) != 0:

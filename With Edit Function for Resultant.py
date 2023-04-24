@@ -261,7 +261,7 @@ class Case_2(tk.Toplevel):
         self.missing_yvar: tk.StringVar = tk.StringVar(self, "0.0000")
         self.missing_vct_var: tk.StringVar = tk.StringVar(self, "0.0000")
         self.missing_thetavar: tk.StringVar = tk.StringVar(self, "0.0000")
-        self.missing_vct: np.ndarray = []
+        self.missing_vct: np.ndarray = np.array([])
 
         self.control_panel = tk.Frame(self)
         self.control_panel.grid(column = 0, row = 0, rowspan = 2, sticky = "nsew")
@@ -459,6 +459,10 @@ class Case_2(tk.Toplevel):
         self.quiver_dict[given_vector_name] = self.plot.quiver(x, y, alpha = 0.5, color = "g", scale = 1, scale_units = "xy", angles = "xy") # Need to change
         self.tree.insert("", "end", given_vector_name, values = (given_vector_name, "%.6f" % x, "%.6f" % y, "%.6f" % r, "%.6f" % theta))
 
+        self.given_name_entry.delete(0, "end")
+        self.given_req1_entry.delete(0, "end")
+        self.given_req2_entry.delete(0, "end")
+
         self.get_missing_vct()
         self.rescale_graph()
         return
@@ -472,12 +476,6 @@ class Case_2(tk.Toplevel):
         if resultant_vector_name == "":
 
             showerror("Error", "Vector name is empty!")
-            self.resultant_name_entry.focus_set()
-            return
-        
-        elif np.any(self.resultant_vct) == True:
-
-            showerror("Error", f"There should only be one resultant vector.")
             self.resultant_name_entry.focus_set()
             return
         
@@ -524,12 +522,37 @@ class Case_2(tk.Toplevel):
         self.resultant_yvar.set(value = "%.4f" % self.resultant_vct[1]) # type: ignore
         self.resultant_vct_var.set(value = "%.4f" % np.hypot(self.resultant_vct[0], self.resultant_vct[1]))
         self.resultant_thetavar.set(value = "%.4f" % np.rad2deg(np.arctan2(self.resultant_vct[1], self.resultant_vct[0])))
+        self.resultant_plot.remove()
         self.resultant_plot = self.plot.quiver(*self.resultant_vct, color = "black", scale = 1, scale_units = "xy", angles = "xy") # type: ignore
+
+        self.resultant_name_entry = ttk.Label(self.resultant_vector_frame, textvariable = self.resultant_name_var)
+        self.resultant_name_entry.grid(column = 1, row = 0, columnspan = 3, sticky = "new", padx = 10)
+        self.resultant_req1_entry = ttk.Label(self.resultant_vector_frame, textvariable = self.resultant_req1_var)
+        self.resultant_req1_entry.grid(column = 1, row = 1, sticky = "ew", padx = 10, pady = 10)
+        self.resultant_req2_entry = ttk.Label(self.resultant_vector_frame, textvariable = self.resultant_req2_var)
+        self.resultant_req2_entry.grid(column = 3, row = 1, sticky = "ew", padx = 10, pady = 10)
+        ttk.Button(self.resultant_vector_frame, text = "Edit Vector", command = self.edit_resultant_vector).grid(column=0, row=3, columnspan=4, sticky="ew", pady=(5,10), padx=10)
+
 
         self.get_missing_vct()
         self.rescale_graph()
+
+
         return
+        
+    def edit_resultant_vector(self) -> None:
+            self.resultant_name_entry = ttk.Entry(self.resultant_vector_frame, textvariable = self.resultant_name_var)
+            self.resultant_name_entry.grid(column = 1, row = 0, columnspan = 3, sticky = "new", padx = 10)
+            self.resultant_req1_entry = ttk.Entry(self.resultant_vector_frame, textvariable = self.resultant_req1_var)
+            self.resultant_req1_entry.grid(column = 1, row = 1, sticky = "ew", padx = 10, pady = 10)
+            self.resultant_req2_entry = ttk.Entry(self.resultant_vector_frame, textvariable = self.resultant_req2_var)
+            self.resultant_req2_entry.grid(column = 3, row = 1, sticky = "ew", padx = 10, pady = 10)
+            ttk.Button(self.resultant_vector_frame, text = "Save", command = self.add_resultant_vector).grid(column=0, row=3, columnspan=4, sticky="ew", pady=(5,10), padx=10)
             
+            self.get_missing_vct()
+            self.rescale_graph()
+
+
     def get_missing_vct(self) -> None:
         if np.any(self.resultant_vct) == True:
             if len(self.vector_dict) != 0:
