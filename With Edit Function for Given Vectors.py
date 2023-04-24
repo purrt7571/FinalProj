@@ -483,22 +483,64 @@ class Case_2(tk.Toplevel):
         if self.vector_dict:
             pass
         else:
-            self.resultant_plot.remove()
-            self.missing_vct_plot.remove()
-            self.resultant_vct = np.array([])
-            self.missing_vct = np.array([])
+            self.reset()
 
-        # need ayusin since hindi nagrereset ang mga numbers
-
-        print(self.vector_dict)
-        print(self.quiver_dict)
 
         self.get_missing_vct()
         self.rescale_graph()
         return
-    
+
     def remove_all_given(self) -> None:
-        pass
+        selected_vector = self.tree.get_children()
+        for select in selected_vector:
+            self.vector_dict.pop(select)
+            self.quiver_dict[select].remove()
+            self.quiver_dict.pop(select)
+            self.tree.delete(select)
+
+        if self.vector_dict:
+            pass
+        else:
+            self.reset()
+
+        self.get_missing_vct()
+        self.rescale_graph()
+        return
+
+        
+    def reset(self) -> None:
+        self.resultant_plot.remove()
+        self.missing_vct_plot.remove()
+        self.resultant_vct = np.array([])
+        self.missing_vct = np.array([])
+        self.resultant_plot = {}
+        self.missing_vct_plot = {}
+
+        self.resultant_name_entry = ttk.Entry(self.resultant_vector_frame, textvariable = self.resultant_name_var)
+        self.resultant_name_entry.grid(column = 1, row = 0, columnspan = 3, sticky = "new", padx = 10)
+        self.resultant_req1_entry = ttk.Entry(self.resultant_vector_frame, textvariable = self.resultant_req1_var)
+        self.resultant_req1_entry.grid(column = 1, row = 1, sticky = "ew", padx = 10, pady = 10)
+        self.resultant_req2_entry = ttk.Entry(self.resultant_vector_frame, textvariable = self.resultant_req2_var)
+        self.resultant_req2_entry.grid(column = 3, row = 1, sticky = "ew", padx = 10, pady = 10)
+        ttk.Button(self.resultant_vector_frame, text = "Add Vector", command = self.add_resultant_vector).grid(column=0, row=3, columnspan=4, sticky="ew", pady=(5,10), padx=10)
+
+        self.given_name_entry.delete(0, "end")
+        self.given_req1_entry.delete(0, "end")
+        self.given_req2_entry.delete(0, "end")
+        self.resultant_name_entry.delete(0, "end")
+        self.resultant_req1_entry.delete(0, "end")
+        self.resultant_req2_entry.delete(0, "end")
+
+        self.resultant_xvar.set(value = "0.0000")
+        self.resultant_yvar.set(value = "0.0000")
+        self.resultant_vct_var.set(value = "0.0000")
+        self.resultant_thetavar.set(value = "0.0000")
+        self.missing_xvar.set(value = "0.0000")
+        self.missing_yvar.set(value = "0.0000")
+        self.missing_vct_var.set(value = "0.0000")
+        self.missing_thetavar.set(value = "0.0000")
+
+        return
 
     def add_resultant_vector(self) -> None:
         """
@@ -555,8 +597,7 @@ class Case_2(tk.Toplevel):
         self.resultant_yvar.set(value = "%.4f" % self.resultant_vct[1]) # type: ignore
         self.resultant_vct_var.set(value = "%.4f" % np.hypot(self.resultant_vct[0], self.resultant_vct[1]))
         self.resultant_thetavar.set(value = "%.4f" % np.rad2deg(np.arctan2(self.resultant_vct[1], self.resultant_vct[0])))
-        self.resultant_plot.remove()
-        self.resultant_plot = self.plot.quiver(*self.resultant_vct, color = "black", scale = 1, scale_units = "xy", angles = "xy") # type: ignore
+        self.check_existing_resultantplot()
 
         self.resultant_name_entry = ttk.Label(self.resultant_vector_frame, textvariable = self.resultant_name_var)
         self.resultant_name_entry.grid(column = 1, row = 0, columnspan = 3, sticky = "new", padx = 10)
@@ -581,7 +622,8 @@ class Case_2(tk.Toplevel):
             self.resultant_req2_entry = ttk.Entry(self.resultant_vector_frame, textvariable = self.resultant_req2_var)
             self.resultant_req2_entry.grid(column = 3, row = 1, sticky = "ew", padx = 10, pady = 10)
             ttk.Button(self.resultant_vector_frame, text = "Save", command = self.add_resultant_vector).grid(column=0, row=3, columnspan=4, sticky="ew", pady=(5,10), padx=10)
-            
+            self.check_existing_resultantplot()
+
             self.get_missing_vct()
             self.rescale_graph()
 
@@ -597,13 +639,29 @@ class Case_2(tk.Toplevel):
                 self.missing_vct_var.set(value = "%.4f" % np.hypot(missing_x, missing_y))
                 self.missing_thetavar.set(value = "%.4f" % np.rad2deg(np.arctan2(missing_y, missing_x)))
                 self.missing_vct = np.array([missing_x,missing_y])
-                self.missing_vct_plot.remove()
-                self.missing_vct_plot = self.plot.quiver(*self.missing_vct, color = "r", scale = 1, scale_units = "xy", angles = "xy") # type: ignore
+                
+                self.check_existing_missing_vctplot()
+
             else:
                 return
         else:
             return
 
+    def check_existing_resultantplot(self) -> None:
+        if self.resultant_plot != {}:
+            self.resultant_plot.remove()
+            self.resultant_plot = self.plot.quiver(*self.resultant_vct, color = "black", scale = 1, scale_units = "xy", angles = "xy") # type: ignore
+        else:
+            self.resultant_plot = self.plot.quiver(*self.resultant_vct, color = "black", scale = 1, scale_units = "xy", angles = "xy") # type: ignore
+        return
+
+    def check_existing_missing_vctplot(self) -> None:
+        if self.missing_vct_plot != {}:
+            self.missing_vct_plot.remove()
+            self.missing_vct_plot = self.plot.quiver(*self.missing_vct, color = "r", scale = 1, scale_units = "xy", angles = "xy") # type: ignore
+        else:
+            self.missing_vct_plot = self.plot.quiver(*self.missing_vct, color = "r", scale = 1, scale_units = "xy", angles = "xy") # type: ignore
+        return
 
     def rescale_graph(self) -> None:
 
