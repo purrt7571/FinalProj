@@ -467,71 +467,68 @@ class Case_2(tk.Toplevel):
         """
         Add a resultant vector to the table with a unique name and plot the vector into the plane.
         """
-        if np.any(self.resultant_vct) == False:
-            resultant_vector_name = self.resultant_name_var.get()
+        resultant_vector_name = self.resultant_name_var.get()
 
-            if resultant_vector_name == "":
+        if resultant_vector_name == "":
 
-                showerror("Error", "Vector name is empty!")
-                self.resultant_name_entry.focus_set()
+            showerror("Error", "Vector name is empty!")
+            self.resultant_name_entry.focus_set()
+            return
+        
+        elif np.any(self.resultant_vct) == True:
+
+            showerror("Error", f"There should only be one resultant vector.")
+            self.resultant_name_entry.focus_set()
+            return
+        
+        elif self.resultant_coordinate.get():
+
+            try:
+                r = float(self.resultant_req1_var.get())
+            except ValueError:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.resultant_req1_entry.focus_set()
                 return
             
-            elif np.any(self.resultant_vct) == True:
-
-                showerror("Error", f"There should only be one resultant vector.")
-                self.resultant_name_entry.focus_set()
+            try:
+                theta = float(self.resultant_req2_var.get())
+            except ValueError:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.resultant_req2_entry.focus_set()
                 return
             
-            elif self.resultant_coordinate.get():
-
-                try:
-                    r = float(self.resultant_req1_var.get())
-                except ValueError:
-                    showerror("Error", "Value must be a valid decimal number!")
-                    self.resultant_req1_entry.focus_set()
-                    return
-                
-                try:
-                    theta = float(self.resultant_req2_var.get())
-                except ValueError:
-                    showerror("Error", "Value must be a valid decimal number!")
-                    self.resultant_req2_entry.focus_set()
-                    return
-                
-                x = r * np.cos(np.radians(theta))
-                y = r * np.sin(np.radians(theta))
-
-            else:
-
-                try:
-                    x = float(self.resultant_req1_var.get())
-                except ValueError as e:
-                    showerror("Error", "Value must be a valid decimal number!")
-                    self.resultant_req1_entry.focus_set()
-                    return
-                
-                try:
-                    y = float(self.resultant_req2_var.get())
-                except ValueError as e:
-                    showerror("Error", "Value must be a valid decimal number!")
-                    self.resultant_req2_entry.focus_set()
-                    return
-
-                r = np.hypot(x,y)
-                theta = np.rad2deg(np.arctan2(y, x))
-            
-            self.resultant_vct = np.array([x,y])
-            self.resultant_xvar.set(value = "%.4f" % self.resultant_vct[0]) # type: ignore
-            self.resultant_yvar.set(value = "%.4f" % self.resultant_vct[1]) # type: ignore
-            self.resultant_vct_var.set(value = "%.4f" % np.hypot(self.resultant_vct[0], self.resultant_vct[1]))
-            self.resultant_thetavar.set(value = "%.4f" % np.rad2deg(np.arctan2(self.resultant_vct[1], self.resultant_vct[0])))
-            self.resultant_plot = self.plot.quiver(*self.resultant_vct, color = "black", scale = 1, scale_units = "xy", angles = "xy") # type: ignore
-
-            self.get_missing_vct()
-            self.rescale_graph()
+            x = r * np.cos(np.radians(theta))
+            y = r * np.sin(np.radians(theta))
 
         else:
-            return
+
+            try:
+                x = float(self.resultant_req1_var.get())
+            except ValueError as e:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.resultant_req1_entry.focus_set()
+                return
+            
+            try:
+                y = float(self.resultant_req2_var.get())
+            except ValueError as e:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.resultant_req2_entry.focus_set()
+                return
+
+            r = np.hypot(x,y)
+            theta = np.rad2deg(np.arctan2(y, x))
+        
+        self.resultant_vct = np.array([x,y])
+        self.resultant_xvar.set(value = "%.4f" % self.resultant_vct[0]) # type: ignore
+        self.resultant_yvar.set(value = "%.4f" % self.resultant_vct[1]) # type: ignore
+        self.resultant_vct_var.set(value = "%.4f" % np.hypot(self.resultant_vct[0], self.resultant_vct[1]))
+        self.resultant_thetavar.set(value = "%.4f" % np.rad2deg(np.arctan2(self.resultant_vct[1], self.resultant_vct[0])))
+        self.resultant_plot = self.plot.quiver(*self.resultant_vct, color = "black", scale = 1, scale_units = "xy", angles = "xy") # type: ignore
+
+        self.get_missing_vct()
+        self.rescale_graph()
+        return
             
     def get_missing_vct(self) -> None:
         if np.any(self.resultant_vct) == True:

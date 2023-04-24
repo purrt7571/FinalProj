@@ -261,7 +261,7 @@ class Case_2(tk.Toplevel):
         self.missing_yvar: tk.StringVar = tk.StringVar(self, "0.0000")
         self.missing_vct_var: tk.StringVar = tk.StringVar(self, "0.0000")
         self.missing_thetavar: tk.StringVar = tk.StringVar(self, "0.0000")
-        self.missing_vct: np.ndarray = []
+        self.missing_vct: np.ndarray = np.array([])
 
         self.control_panel = tk.Frame(self)
         self.control_panel.grid(column = 0, row = 0, rowspan = 2, sticky = "nsew")

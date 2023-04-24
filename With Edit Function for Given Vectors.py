@@ -485,7 +485,10 @@ class Case_2(tk.Toplevel):
         else:
             self.resultant_plot.remove()
             self.missing_vct_plot.remove()
+            self.resultant_vct = np.array([])
+            self.missing_vct = np.array([])
 
+        # need ayusin since hindi nagrereset ang mga numbers
 
         print(self.vector_dict)
         print(self.quiver_dict)
