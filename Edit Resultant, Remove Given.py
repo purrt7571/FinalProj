@@ -509,8 +509,11 @@ class Case_2(tk.Toplevel):
 
         
     def reset(self) -> None:
-        self.resultant_plot.remove()
-        self.missing_vct_plot.remove()
+        if self.resultant_plot != {}:
+            self.resultant_plot.remove()
+            self.missing_vct_plot.remove()
+        else:
+            pass
         self.resultant_vct = np.array([])
         self.missing_vct = np.array([])
         self.resultant_plot = {}
