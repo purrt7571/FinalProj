@@ -47,10 +47,6 @@ class BaseWindow(tk.Toplevel):
         self.vector_frame.grid_columnconfigure(1,weight=3)
         self.vector_frame.grid_columnconfigure(2,weight=1)
         self.vector_frame.grid_columnconfigure(3,weight=3)
-        self.vector_frame.grid_rowconfigure(0, weight=0)
-        self.vector_frame.grid_rowconfigure(1, weight=0)
-        self.vector_frame.grid_rowconfigure(2, weight=0)
-        self.vector_frame.grid_rowconfigure(3, weight=0)
 
         ttk.Label(self.vector_frame, text = "Vector name: ").grid(column = 0, row = 0, sticky = "nw", padx = 10)
         ttk.Label(self.vector_frame, text="X / R : ").grid(column=0, row=1, sticky="ew", padx=10)
