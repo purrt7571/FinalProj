@@ -63,7 +63,8 @@ class BaseWindow(tk.Toplevel):
         ttk.Radiobutton(self.vector_frame, text="Magnitude and Direction", variable=self.coordinate, value=1).grid(column=2, row=2, columnspan=2, sticky="ew", padx=10, pady=10)
         self.add_vector_button = ttk.Button(self.vector_frame, text="Add Vector")
         self.add_vector_button.grid(column=0, row=3, columnspan=4, sticky="ew", pady=5, padx=10)
-        ttk.Button(self.vector_frame, text="Remove Vector", command=self.remove_vector).grid(column=0, row=4, columnspan=4, sticky="ew", padx=10, pady=(5,10))
+        self.remove_vector_button = ttk.Button(self.vector_frame, text="Remove Vector")
+        self.remove_vector_button.grid(column=0, row=4, columnspan=4, sticky="ew", padx=10, pady=(5,10))
 
         self.tree = ttk.Treeview(master=self, columns=("name", "x", "y", "rm", "rtheta"), show="headings")
         self.tree.grid(column=1, row=0, sticky="nsew")
@@ -209,9 +210,10 @@ class OneMissingVector(BaseWindow):
 
         ttk.Radiobutton(self.missing_vector_frame, text="X and Y components", variable=self.missing_coordinate, value=0).grid(column=0, row=3, columnspan=2, sticky="ew", padx=10, pady=10)
         ttk.Radiobutton(self.missing_vector_frame, text="Magnitude and Direction", variable=self.missing_coordinate, value=1).grid(column=2, row=3, columnspan=2, sticky="ew", padx=10, pady=10)
-        ttk.Checkbutton(self.missing_vector_frame, text="Find and Auto-update missing vector", command=self.find_one_missing_vector, variable=self.auto_update).grid(column=0, row=4, columnspan=4, sticky="ew", pady=(5,10), padx=10)
+        ttk.Checkbutton(self.missing_vector_frame, text="Find and Auto-update missing vector", command=self.get_expected_resultant, variable=self.auto_update).grid(column=0, row=4, columnspan=4, sticky="ew", pady=(5,10), padx=10)
 
         self.add_vector_button.configure(command=self.add_vector)
+        self.remove_vector_button.configure(command=self.rm_vector)
         return
     
     def add_vector(self) -> None:
@@ -281,6 +283,16 @@ class OneMissingVector(BaseWindow):
 
         return
     
+    def rm_vector(self) -> None:
+
+        self.remove_vector()
+        
+        if self.auto_update.get(): self.find_missing_vector()
+
+        self.get_resultant()
+        self.rescale_graph()
+        return
+    
     def find_missing_vector(self) -> None:
 
         vector_name = self.missing_name_var.get()
@@ -296,7 +308,7 @@ class OneMissingVector(BaseWindow):
         
         return
     
-    def find_one_missing_vector(self) -> None:
+    def get_expected_resultant(self) -> None:
 
         vector_name = self.missing_name_var.get()
 
