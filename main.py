@@ -62,7 +62,8 @@ class BaseWindow(tk.Toplevel):
         ttk.Radiobutton(self.vector_frame, text="X and Y components", variable=self.coordinate, value=0).grid(column=0, row=2, columnspan=2, sticky="ew", padx=10, pady=10)
         ttk.Radiobutton(self.vector_frame, text="Magnitude and Direction", variable=self.coordinate, value=1).grid(column=2, row=2, columnspan=2, sticky="ew", padx=10, pady=10)
         self.add_vector_button = ttk.Button(self.vector_frame, text="Add Vector")
-        self.add_vector_button.grid(column=0, row=3, columnspan=4, sticky="ew", pady=(5,10), padx=10)
+        self.add_vector_button.grid(column=0, row=3, columnspan=4, sticky="ew", pady=5, padx=10)
+        ttk.Button(self.vector_frame, text="Remove Vector", command=self.remove_vector).grid(column=0, row=4, columnspan=4, sticky="ew", padx=10, pady=(5,10))
 
         self.tree = ttk.Treeview(master=self, columns=("name", "x", "y", "rm", "rtheta"), show="headings")
         self.tree.grid(column=1, row=0, sticky="nsew")
@@ -113,7 +114,26 @@ class BaseWindow(tk.Toplevel):
         self.rescale_graph()
         
         return
+    
+    def remove_vector(self) -> None:
 
+        selected = self.tree.selection()
+
+        if len(selected):
+            
+            for name in selected:
+                self.vector_dict.pop(name)
+                self.quiver_dict.pop(name).remove()
+                self.tree.delete(name)
+
+            self.get_resultant()
+            self.rescale_graph()
+
+        else:
+
+            showerror("Error", "No vector selected on the table!")
+
+        return
     
     def get_resultant(self) -> None:
 
@@ -283,12 +303,14 @@ class OneMissingVector(BaseWindow):
         if vector_name == "":
 
             showerror("Error", "Vector name is empty!")
+            self.auto_update.set(0)
             self.missing_name_entry.focus_set()
             return
         
         elif vector_name in self.vector_dict:
 
             showerror("Error", f"Vector \"{vector_name}\" already exists!")
+            self.auto_update.set(0)
             self.missing_name_entry.focus_set()
             return
 
