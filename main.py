@@ -220,19 +220,19 @@ class OneMissingVector(BaseWindow):
         """
         vector_name = self.name_var.get()
 
-        if self.coordinate.get():
-        
-            if vector_name == "":
+        if vector_name == "":
 
-                showerror("Error", "Vector name is empty!")
-                self.name_entry.focus_set()
-                return
+            showerror("Error", "Vector name is empty!")
+            self.name_entry.focus_set()
+            return
         
-            elif vector_name in self.vector_dict:
+        elif vector_name in self.vector_dict:
 
-                showerror("Error", f"Vector \"{vector_name}\" already exists!")
-                self.name_entry.focus_set()
-                return
+            showerror("Error", f"Vector \"{vector_name}\" already exists!")
+            self.name_entry.focus_set()
+            return
+        
+        elif self.coordinate.get():
 
             try:
                 r = float(self.req1_var.get())
@@ -300,23 +300,23 @@ class OneMissingVector(BaseWindow):
 
         vector_name = self.missing_name_var.get()
 
-        if vector_name == "":
-
-            showerror("Error", "Vector name is empty!")
-            self.auto_update.set(0)
-            self.missing_name_entry.focus_set()
-            return
-        
-        elif vector_name in self.vector_dict:
-
-            showerror("Error", f"Vector \"{vector_name}\" already exists!")
-            self.auto_update.set(0)
-            self.missing_name_entry.focus_set()
-            return
-
         if self.auto_update.get():
+
+            if vector_name == "":
+
+                showerror("Error", "Vector name is empty!")
+                self.auto_update.set(0)
+                self.missing_name_entry.focus_set()
+                return
             
-            if self.missing_coordinate.get():
+            elif vector_name in self.vector_dict:
+
+                showerror("Error", f"Vector \"{vector_name}\" already exists!")
+                self.auto_update.set(0)
+                self.missing_name_entry.focus_set()
+                return
+            
+            elif self.missing_coordinate.get():
 
                 try:
                     r = float(self.missing_req1_var.get())
