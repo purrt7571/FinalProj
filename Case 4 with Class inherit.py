@@ -597,7 +597,6 @@ class Case_2(BaseWindow):
         self.canvas.draw()
         return
 
-
 root = HdpiTk()
 root.title("VectorSim")
 root.minsize(300, 100)
