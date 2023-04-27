@@ -10,19 +10,19 @@ from tkinter.messagebox import showerror
 
         
 class BaseWindow(tk.Toplevel):
+
     """
     Base window for each case with a control panel, table, resultant, and graphing plane.
     """
+
     def __init__(self, master: tk.Tk, minwidth: int = 1500, minheight: int = 900) -> None:
 
         super().__init__(master=master)
         self.title("VectorSim")
         self.minsize(minwidth, minheight)
         self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=0)
         self.grid_columnconfigure(2, weight=3)
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=0)
+        self.grid_rowconfigure(0, weight=1)                                                                                                                                                                                                                             
 
         self.name_var: tk.StringVar = tk.StringVar(self)
         self.req1_var: tk.StringVar = tk.StringVar(self)
@@ -41,7 +41,7 @@ class BaseWindow(tk.Toplevel):
         self.control_panel.grid(column=0, row=0, rowspan=2, sticky="nsew")
         self.control_panel.grid_columnconfigure(0, weight=1)
         
-        self.vector_frame = ttk.Labelframe(self.control_panel, text="Vector")
+        self.vector_frame = ttk.Labelframe(self.control_panel, text="Given Vector (Green)")
         self.vector_frame.grid(column=0, row=0, sticky="new", padx=10, pady=10)
         self.vector_frame.grid_columnconfigure(0,weight=1)
         self.vector_frame.grid_columnconfigure(1,weight=3)
@@ -61,7 +61,8 @@ class BaseWindow(tk.Toplevel):
 
         ttk.Radiobutton(self.vector_frame, text="X and Y components", variable=self.coordinate, value=0).grid(column=0, row=2, columnspan=2, sticky="ew", padx=10, pady=10)
         ttk.Radiobutton(self.vector_frame, text="Magnitude and Direction", variable=self.coordinate, value=1).grid(column=2, row=2, columnspan=2, sticky="ew", padx=10, pady=10)
-        ttk.Button(self.vector_frame, text="Add Vector", command=self.add_vector).grid(column=0, row=3, columnspan=4, sticky="ew", pady=(5,10), padx=10)
+        self.add_vector_button = ttk.Button(self.vector_frame, text="Add Vector")
+        self.add_vector_button.grid(column=0, row=3, columnspan=4, sticky="ew", pady=(5,10), padx=10)
 
         self.tree = ttk.Treeview(master=self, columns=("name", "x", "y", "rm", "rtheta"), show="headings")
         self.tree.grid(column=1, row=0, sticky="nsew")
@@ -86,7 +87,6 @@ class BaseWindow(tk.Toplevel):
         self.resultant_canvas.grid_columnconfigure(5, weight=3)
         self.resultant_canvas.grid_columnconfigure(6, weight=1)
         self.resultant_canvas.grid_columnconfigure(7, weight=3)
-        self.resultant_canvas.grid_rowconfigure(0, weight=0)
 
         ttk.Label(self.resultant_canvas, text="X=").grid(column=0, row=0, sticky="nsw", pady=10)
         ttk.Label(self.resultant_canvas, text="Y=").grid(column=2, row=0, sticky="nsw", pady=10)
@@ -111,71 +111,9 @@ class BaseWindow(tk.Toplevel):
         
         self.protocol("WM_DELETE_WINDOW", self.close)
         self.rescale_graph()
+        
         return
-    
-    def add_vector(self) -> None:
-        """
-        Add a vector to the table with a unique name and plot the vector into the plane.
-        """
-        vector_name = self.name_var.get()
 
-        if vector_name == "":
-
-            showerror("Error", "Vector name is empty!")
-            self.name_entry.focus_set()
-            return
-        
-        elif vector_name in self.quiver_dict:
-
-            showerror("Error", f"Vector \"{vector_name}\" already exists!")
-            self.name_entry.focus_set()
-            return
-        
-        elif self.coordinate.get():
-
-            try:
-                r = float(self.req1_var.get())
-            except ValueError:
-                showerror("Error", "Value must be a valid decimal number!")
-                self.req1_entry.focus_set()
-                return
-            
-            try:
-                theta = float(self.req2_var.get())
-            except ValueError:
-                showerror("Error", "Value must be a valid decimal number!")
-                self.req2_entry.focus_set()
-                return
-            
-            x = r * np.cos(np.radians(theta))
-            y = r * np.sin(np.radians(theta))
-
-        else:
-
-            try:
-                x = float(self.req1_var.get())
-            except ValueError as e:
-                showerror("Error", "Value must be a valid decimal number!")
-                self.req1_entry.focus_set()
-                return
-            
-            try:
-                y = float(self.req2_var.get())
-            except ValueError as e:
-                showerror("Error", "Value must be a valid decimal number!")
-                self.req2_entry.focus_set()
-                return
-
-            r = np.hypot(x,y)
-            theta = np.rad2deg(np.arctan2(y, x))
-        
-        self.vector_dict[vector_name] = np.array([x, y])
-        self.quiver_dict[vector_name] = self.plot.quiver(x, y, alpha=0.5, color="g", scale=1, scale_units="xy", angles="xy") # Need to change
-        self.tree.insert("", "end", vector_name, values=(vector_name, "%.6f" % x, "%.6f" % y, "%.6f" % r, "%.6f" % theta))
-
-        self.get_resultant()
-        self.rescale_graph()
-        return
     
     def get_resultant(self) -> None:
 
@@ -209,7 +147,6 @@ class BaseWindow(tk.Toplevel):
 
         self.canvas.draw()
         return
-        
     
     def close(self) -> None:
 
@@ -224,7 +161,7 @@ class OneMissingVector(BaseWindow):
 
         super().__init__(master, minwidth, minheight)
 
-        self.missing_vector_frame = ttk.LabelFrame(master=self.control_panel, text="One Missing Vector")
+        self.missing_vector_frame = ttk.LabelFrame(master=self.control_panel, text="One Missing Vector (Red)")
         self.missing_vector_frame.grid(column=0, row=2, sticky="new", padx=10, pady=10)
         self.missing_vector_frame.grid_columnconfigure(0,weight=1)
         self.missing_vector_frame.grid_columnconfigure(1,weight=3)
@@ -235,6 +172,8 @@ class OneMissingVector(BaseWindow):
         self.missing_req1_var: tk.StringVar = tk.StringVar(self)
         self.missing_req2_var: tk.StringVar = tk.StringVar(self)
         self.missing_coordinate: tk.IntVar = tk.IntVar(self, value=0)
+        self.auto_update: tk.IntVar = tk.IntVar(self, value=0)
+        self.expected_resultant: np.ndarray = np.array([0,0])
 
         ttk.Label(self.missing_vector_frame, text="Vector name: ").grid(column=0, row=0, sticky="nw", padx=10)
         ttk.Label(self.missing_vector_frame, text="X / R : ").grid(column=0, row=2, sticky="ew", padx=10)
@@ -250,14 +189,96 @@ class OneMissingVector(BaseWindow):
 
         ttk.Radiobutton(self.missing_vector_frame, text="X and Y components", variable=self.missing_coordinate, value=0).grid(column=0, row=3, columnspan=2, sticky="ew", padx=10, pady=10)
         ttk.Radiobutton(self.missing_vector_frame, text="Magnitude and Direction", variable=self.missing_coordinate, value=1).grid(column=2, row=3, columnspan=2, sticky="ew", padx=10, pady=10)
-        ttk.Button(self.missing_vector_frame, text="Add Vector", command=self.find_one_missing_vector).grid(column=0, row=4, columnspan=4, sticky="ew", pady=(5,10), padx=10)
+        ttk.Checkbutton(self.missing_vector_frame, text="Find and Auto-update missing vector", command=self.find_one_missing_vector, variable=self.auto_update).grid(column=0, row=4, columnspan=4, sticky="ew", pady=(5,10), padx=10)
 
+        self.add_vector_button.configure(command=self.add_vector)
+        return
+    
+    def add_vector(self) -> None:
+        """
+        Add a vector to the table with a unique name and plot the vector into the plane.
+        """
+        vector_name = self.name_var.get()
+
+        if vector_name == "":
+
+            showerror("Error", "Vector name is empty!")
+            self.name_entry.focus_set()
+            return
+        
+        elif vector_name in self.vector_dict:
+
+            showerror("Error", f"Vector \"{vector_name}\" already exists!")
+            self.name_entry.focus_set()
+            return
+        
+        elif self.coordinate.get():
+
+            try:
+                r = float(self.req1_var.get())
+            except ValueError:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.req1_entry.focus_set()
+                return
+            
+            try:
+                theta = float(self.req2_var.get())
+            except ValueError:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.req2_entry.focus_set()
+                return
+            
+            x = r * np.cos(np.radians(theta))
+            y = r * np.sin(np.radians(theta))
+
+        else:
+
+            try:
+                x = float(self.req1_var.get())
+            except ValueError:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.req1_entry.focus_set()
+                return
+            
+            try:
+                y = float(self.req2_var.get())
+            except ValueError:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.req2_entry.focus_set()
+                return
+
+            r = np.hypot(x,y)
+            theta = np.rad2deg(np.arctan2(y, x))
+        
+        self.vector_dict[vector_name] = np.array([x, y])
+        self.quiver_dict[vector_name] = self.plot.quiver(x, y, alpha=0.5, color="g", scale=1, scale_units="xy", angles="xy") # Need to change
+        self.tree.insert("", "end", vector_name, values=(vector_name, "%.6f" % x, "%.6f" % y, "%.6f" % r, "%.6f" % theta))
+
+        if self.auto_update.get(): self.find_missing_vector()
+
+        self.get_resultant()
+        self.rescale_graph()
+
+        return
+    
+    def find_missing_vector(self) -> None:
+
+        vector_name = self.missing_name_var.get()
+
+        self.vector_dict.pop(vector_name)
+        self.quiver_dict[vector_name].remove()
+        self.tree.delete(vector_name)
+
+        missing_vector = self.expected_resultant - sum(self.vector_dict.values())
+        self.vector_dict[vector_name] = missing_vector
+        self.quiver_dict[vector_name] = self.plot.quiver(*missing_vector, alpha=0.5, color="r", scale=1, scale_units="xy", angles="xy")
+        self.tree.insert("", "end", vector_name, values=(vector_name, "%.6f" % missing_vector[0], "%.6f" % missing_vector[1], "%.6f" % np.hypot(*missing_vector), "%.6f" % np.rad2deg(np.arctan2(missing_vector[1], missing_vector[0]))))
+        
         return
     
     def find_one_missing_vector(self) -> None:
 
         vector_name = self.missing_name_var.get()
-        sum_vectors = sum(self.vector_dict.values()) if len(self.vector_dict) else np.array([0, 0])
 
         if vector_name == "":
 
@@ -265,58 +286,68 @@ class OneMissingVector(BaseWindow):
             self.missing_name_entry.focus_set()
             return
         
-        elif vector_name in self.quiver_dict:
+        elif vector_name in self.vector_dict:
 
             showerror("Error", f"Vector \"{vector_name}\" already exists!")
             self.missing_name_entry.focus_set()
             return
-        
-        elif self.missing_coordinate.get():
 
-            try:
-                r = float(self.missing_req1_var.get())
-            except ValueError:
-                showerror("Error", "Value must be a valid decimal number!")
-                self.missing_req1_entry.focus_set()
-                return
+        if self.auto_update.get():
             
-            try:
-                theta = float(self.missing_req2_var.get())
-            except ValueError:
-                showerror("Error", "Value must be a valid decimal number!")
-                self.missing_req2_entry.focus_set()
-                return
-            
-            x = r * np.cos(np.radians(theta)) - sum_vectors[0] # type: ignore
-            y = r * np.sin(np.radians(theta)) - sum_vectors[1] # type: ignore
-            r = np.hypot(x, y)
-            theta = np.rad2deg(np.arctan2(y, x))
+            if self.missing_coordinate.get():
+
+                try:
+                    r = float(self.missing_req1_var.get())
+                except ValueError:
+                    showerror("Error", "Value must be a valid decimal number!")
+                    self.missing_req1_entry.focus_set()
+                    return
+                
+                try:
+                    theta = float(self.missing_req2_var.get())
+                except ValueError:
+                    showerror("Error", "Value must be a valid decimal number!")
+                    self.missing_req2_entry.focus_set()
+                    return
+                
+                x = r * np.cos(np.radians(theta))
+                y = r * np.sin(np.radians(theta))
+
+            else:
+
+                try:
+                    x = float(self.missing_req1_var.get())
+                except ValueError:
+                    showerror("Error", "Value must be a valid decimal number!")
+                    self.missing_req1_entry.focus_set()
+                    return
+                
+                try:
+                    y = float(self.missing_req2_var.get())
+                except ValueError:
+                    showerror("Error", "Value must be a valid decimal number!")
+                    self.missing_req2_entry.focus_set()
+                    return
+
+            self.missing_name_entry.configure(state="disabled")
+            self.missing_req1_entry.configure(state="disabled")
+            self.missing_req2_entry.configure(state="disabled")
+
+            self.vector_dict[vector_name] = np.array([0,0])
+            self.quiver_dict[vector_name] = self.plot.quiver(0,0)
+            self.tree.insert("", "end", vector_name, values=(vector_name, 0, 0, 0, 0))
+            self.expected_resultant = np.array([x, y])
+
+            self.find_missing_vector()
+            self.get_resultant()
+            self.rescale_graph()
 
         else:
 
-            try:
-                x = float(self.missing_req1_var.get()) - sum_vectors[0] # type: ignore
-            except ValueError as e:
-                showerror("Error", "Value must be a valid decimal number!")
-                self.missing_req1_entry.focus_set()
-                return
-            
-            try:
-                y = float(self.missing_req2_var.get()) - sum_vectors[1] # type: ignore
-            except ValueError as e:
-                showerror("Error", "Value must be a valid decimal number!")
-                self.missing_req2_entry.focus_set()
-                return
+            self.missing_name_entry.configure(state="enabled")
+            self.missing_req1_entry.configure(state="enabled")
+            self.missing_req2_entry.configure(state="enabled")
 
-            r = np.hypot(x,y)
-            theta = np.rad2deg(np.arctan2(y, x))
-        
-        self.vector_dict[vector_name] = np.array([x, y])
-        self.quiver_dict[vector_name] = self.plot.quiver(x, y, alpha=0.5, color="r", scale=1, scale_units="xy", angles="xy") # Need to change
-        self.tree.insert("", "end", vector_name, values=(vector_name, "%.6f" % x, "%.6f" % y, "%.6f" % r, "%.6f" % theta))
-
-        self.get_resultant()
-        self.rescale_graph()
         return
 
 
@@ -334,7 +365,7 @@ class TwoMissingMagnitudes(BaseWindow):
         self.resultant_req2_var = tk.StringVar(self)
         self.missing_coordinate = tk.IntVar(self, value=0)
 
-        self.missing_magnitudes_frame = ttk.Labelframe(self.control_panel, text="Two Missing Magnitudes")
+        self.missing_magnitudes_frame = ttk.Labelframe(self.control_panel, text="Two Missing Magnitudes (Blue)")
         self.missing_magnitudes_frame.grid(column=0, row=2, sticky="new", padx=10, pady=10)
         self.missing_magnitudes_frame.grid_columnconfigure(0,weight=1)
         self.missing_magnitudes_frame.grid_columnconfigure(1,weight=3)
@@ -484,7 +515,7 @@ class TwoMissingMagnitudes(BaseWindow):
         self.quiver_dict[vector2_name] = self.plot.quiver(x[1], y[1], alpha=0.5, color="b", scale=1, scale_units="xy", angles="xy")
         self.tree.insert("", "end", values=(vector1_name, "%.6f" % x[0], "%.6f" % y[0], "%.6f" % magnitudes[0], "%.6f" % angle_array[0]))
         self.tree.insert("", "end", values=(vector2_name, "%.6f" % x[1], "%.6f" % y[1], "%.6f" % magnitudes[1], "%.6f" % angle_array[1]))
-            
+        
         self.get_resultant()
         self.rescale_graph()
         return
