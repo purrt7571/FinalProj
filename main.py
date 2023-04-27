@@ -220,19 +220,19 @@ class OneMissingVector(BaseWindow):
         """
         vector_name = self.name_var.get()
 
-        if vector_name == "":
-
-            showerror("Error", "Vector name is empty!")
-            self.name_entry.focus_set()
-            return
+        if self.coordinate.get():
         
-        elif vector_name in self.vector_dict:
+            if vector_name == "":
 
-            showerror("Error", f"Vector \"{vector_name}\" already exists!")
-            self.name_entry.focus_set()
-            return
+                showerror("Error", "Vector name is empty!")
+                self.name_entry.focus_set()
+                return
         
-        elif self.coordinate.get():
+            elif vector_name in self.vector_dict:
+
+                showerror("Error", f"Vector \"{vector_name}\" already exists!")
+                self.name_entry.focus_set()
+                return
 
             try:
                 r = float(self.req1_var.get())
