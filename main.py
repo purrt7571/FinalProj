@@ -208,8 +208,10 @@ class OneMissingVector(BaseWindow):
         self.missing_req2_entry = ttk.Entry(self.missing_vector_frame, textvariable=self.missing_req2_var)
         self.missing_req2_entry.grid(column=3, row=2, sticky="ew", padx=10, pady=10)
 
-        ttk.Radiobutton(self.missing_vector_frame, text="X and Y components", variable=self.missing_coordinate, value=0).grid(column=0, row=3, columnspan=2, sticky="ew", padx=10, pady=10)
-        ttk.Radiobutton(self.missing_vector_frame, text="Magnitude and Direction", variable=self.missing_coordinate, value=1).grid(column=2, row=3, columnspan=2, sticky="ew", padx=10, pady=10)
+        self.cartesian = ttk.Radiobutton(self.missing_vector_frame, text="X and Y components", variable=self.missing_coordinate, value=0)
+        self.cartesian.grid(column=0, row=3, columnspan=2, sticky="ew", padx=10, pady=10)
+        self.polar = ttk.Radiobutton(self.missing_vector_frame, text="Magnitude and Direction", variable=self.missing_coordinate, value=1)
+        self.polar.grid(column=2, row=3, columnspan=2, sticky="ew", padx=10, pady=10)
         ttk.Checkbutton(self.missing_vector_frame, text="Find and Auto-update missing vector", command=self.get_expected_resultant, variable=self.auto_update).grid(column=0, row=4, columnspan=4, sticky="ew", pady=(5,10), padx=10)
 
         self.add_vector_button.configure(command=self.add_vector)
@@ -373,6 +375,8 @@ class OneMissingVector(BaseWindow):
             self.missing_name_entry.configure(state="disabled")
             self.missing_req1_entry.configure(state="disabled")
             self.missing_req2_entry.configure(state="disabled")
+            self.cartesian.configure(state="disabled")
+            self.polar.configure(state="disabled")
 
             self.vector_dict[vector_name] = np.array([0,0])
             self.quiver_dict[vector_name] = self.plot.quiver(0,0)
@@ -388,6 +392,8 @@ class OneMissingVector(BaseWindow):
             self.missing_name_entry.configure(state="enabled")
             self.missing_req1_entry.configure(state="enabled")
             self.missing_req2_entry.configure(state="enabled")
+            self.cartesian.configure(state="enabled")
+            self.polar.configure(state="enabled")
 
         return
 
