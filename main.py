@@ -285,6 +285,13 @@ class OneMissingVector(BaseWindow):
     
     def rm_vector(self) -> None:
 
+        vector_name = self.missing_name_var.get()
+
+        if vector_name in self.tree.selection():
+            
+            showerror("Error", f"Cannot remove \"{vector_name}\" vector while auto-updating! Please disable auto-update first.")
+            return
+        
         self.remove_vector()
         
         if self.auto_update.get(): self.find_missing_vector()
