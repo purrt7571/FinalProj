@@ -31,7 +31,6 @@ class BaseWindow(tk.Toplevel):
         self.coordinate: tk.IntVar = tk.IntVar(self, value=0)
         self.vector_dict: dict[str, np.ndarray] = {}
         self.quiver_dict: dict[str, Quiver] = {}
-
         self.resultant_vct: np.ndarray = np.array([0, 0])
         self.resultant_vars: dict[str, tk.StringVar] = {"x": tk.StringVar(self, "0.0000"), "y": tk.StringVar(self, "0.0000"), "r": tk.StringVar(self, "0.0000"), "theta": tk.StringVar(self, "0.0000")}
 
@@ -350,10 +349,8 @@ class OneMissingVector(BaseWindow):
             i.set("")
         for i in self.expected_resultant_vars.values():
             i.set("")
-        self.missing_vector_vars["x"].set("")
-        self.missing_vector_vars["y"].set("")
-        self.missing_vector_vars["r"].set("")
-        self.missing_vector_vars["theta"].set("")
+        for i in self.missing_vector_vars.values():
+            i.set("")
         self.coordinate.set(0)
         self.expected_resultant_coordinate.set(0)
         self.missing_name_entry.configure(state="enabled")
