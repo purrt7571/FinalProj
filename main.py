@@ -3,7 +3,7 @@ VectorSim - Python Program for simulating vectors and computing for unknown vari
 """
 import numpy as np
 import tkinter as tk
-import tkinter.ttk as ttk
+from tkinter import ttk
 from hdpitkinter import HdpiTk
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
@@ -467,6 +467,74 @@ class TwoMissingMagnitudes(BaseWindow):
         ttk.Radiobutton(self.missing_magnitudes_frame, text="X and Y components", variable=self.missing_coordinate, value=0).grid(column=0, row=6, columnspan=2, sticky="ew", padx=10, pady=10)
         ttk.Radiobutton(self.missing_magnitudes_frame, text="Magnitude and Direction", variable=self.missing_coordinate, value=1).grid(column=2, row=6, columnspan=2, sticky="ew", padx=10, pady=10)
         ttk.Button(self.missing_magnitudes_frame, text="Find Missing Magnitudes", command=self.find_two_missing_magnitudes).grid(column=0, row=7, columnspan=4, sticky="ew", padx=10, pady=10)
+
+        self.add_vector_button.configure(command=self.add_vector)
+        return
+
+    def add_vector(self) -> None:
+        """
+        Add a vector to the table with a unique name and plot the vector into the plane.
+        """
+        vector_name = self.name_var.get()
+
+        if vector_name == "":
+
+            showerror("Error", "Vector name is empty!")
+            self.name_entry.focus_set()
+            return
+
+        elif vector_name in self.vector_dict:
+
+            showerror("Error", f"Vector \"{vector_name}\" already exists!")
+            self.name_entry.focus_set()
+            return
+
+        elif self.coordinate.get():
+
+            try:
+                r = float(self.req1_var.get())
+            except ValueError:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.req1_entry.focus_set()
+                return
+
+            try:
+                theta = float(self.req2_var.get())
+            except ValueError:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.req2_entry.focus_set()
+                return
+
+            x = r * np.cos(np.radians(theta))
+            y = r * np.sin(np.radians(theta))
+
+        else:
+
+            try:
+                x = float(self.req1_var.get())
+            except ValueError:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.req1_entry.focus_set()
+                return
+
+            try:
+                y = float(self.req2_var.get())
+            except ValueError:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.req2_entry.focus_set()
+                return
+
+            r = np.hypot(x, y)
+            theta_rad = np.arctan2(y, x)
+            theta = np.rad2deg(theta_rad)
+
+        self.vector_dict[vector_name] = np.array([x, y])
+        self.quiver_dict[vector_name] = self.plot.quiver(x, y, alpha=0.5, color="g", scale=1, scale_units="xy", angles="xy")
+        self.tree.insert("", "end", vector_name, values=(vector_name, f"{x: .6f}", f"{y: .6f}", f"{r: .6f}", f"{theta: .6f}"))
+
+        self.get_resultant()
+        self.rescale_graph()
+
         return
 
     def find_two_missing_magnitudes(self) -> None:
