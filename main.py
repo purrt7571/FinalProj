@@ -27,18 +27,13 @@ class BaseWindow(tk.Toplevel):
         self.grid_columnconfigure(2, weight=3)
         self.grid_rowconfigure(0, weight=1)
 
-        self.name_var: tk.StringVar = tk.StringVar(self)
-        self.req1_var: tk.StringVar = tk.StringVar(self)
-        self.req2_var: tk.StringVar = tk.StringVar(self)
+        self.vector_vars: dict[str, tk.StringVar] = {"name": tk.StringVar(self), "req1": tk.StringVar(self), "req2": tk.StringVar(self)}
         self.coordinate: tk.IntVar = tk.IntVar(self, value=0)
         self.vector_dict: dict[str, np.ndarray] = {}
         self.quiver_dict: dict[str, Quiver] = {}
 
         self.resultant_vct: np.ndarray = np.array([0, 0])
-        self.resultant_x_var: tk.StringVar = tk.StringVar(self, "0.0000")
-        self.resultant_y_var: tk.StringVar = tk.StringVar(self, "0.0000")
-        self.resultant_r_var: tk.StringVar = tk.StringVar(self, "0.0000")
-        self.resultant_theta_var: tk.StringVar = tk.StringVar(self, "0.0000")
+        self.resultant_vars: dict[str, tk.StringVar] = {"x": tk.StringVar(self, "0.0000"), "y": tk.StringVar(self, "0.0000"), "r": tk.StringVar(self, "0.0000"), "theta": tk.StringVar(self, "0.0000")}
 
         self.control_panel = tk.Frame(self)
         self.control_panel.grid(column=0, row=0, rowspan=2, sticky="nsew")
@@ -55,11 +50,11 @@ class BaseWindow(tk.Toplevel):
         ttk.Label(self.vector_frame, text="X / R : ").grid(column=0, row=1, sticky="ew", padx=10)
         ttk.Label(self.vector_frame, text="Y / \u03B8 : ").grid(column=2, row=1, sticky="ew", padx=10)
 
-        self.name_entry = ttk.Entry(self.vector_frame, textvariable=self.name_var)
+        self.name_entry = ttk.Entry(self.vector_frame, textvariable=self.vector_vars["name"])
         self.name_entry.grid(column=1, row=0, columnspan=3, sticky="new", padx=10)
-        self.req1_entry = ttk.Entry(self.vector_frame, textvariable=self.req1_var)
+        self.req1_entry = ttk.Entry(self.vector_frame, textvariable=self.vector_vars["req1"])
         self.req1_entry.grid(column=1, row=1, sticky="ew", padx=10, pady=10)
-        self.req2_entry = ttk.Entry(self.vector_frame, textvariable=self.req2_var)
+        self.req2_entry = ttk.Entry(self.vector_frame, textvariable=self.vector_vars["req2"])
         self.req2_entry.grid(column=3, row=1, sticky="ew", padx=10, pady=10)
 
         ttk.Radiobutton(self.vector_frame, text="X and Y components", variable=self.coordinate, value=0).grid(column=0, row=2, columnspan=2, sticky="ew", padx=10, pady=10)
@@ -99,10 +94,10 @@ class BaseWindow(tk.Toplevel):
         ttk.Label(self.resultant_canvas, text="Y=").grid(column=2, row=0, sticky="nsw", pady=10)
         ttk.Label(self.resultant_canvas, text="R=").grid(column=4, row=0, sticky="nsw", pady=10)
         ttk.Label(self.resultant_canvas, text="\u03B8=").grid(column=6, row=0, sticky="nsw", pady=10)
-        ttk.Label(self.resultant_canvas, textvariable=self.resultant_x_var).grid(column=1, row=0, sticky="nsw", pady=10)
-        ttk.Label(self.resultant_canvas, textvariable=self.resultant_y_var).grid(column=3, row=0, sticky="nsw", pady=10)
-        ttk.Label(self.resultant_canvas, textvariable=self.resultant_r_var).grid(column=5, row=0, sticky="nsw", pady=10)
-        ttk.Label(self.resultant_canvas, textvariable=self.resultant_theta_var).grid(column=7, row=0, sticky="nsw", pady=10)
+        ttk.Label(self.resultant_canvas, textvariable=self.resultant_vars["x"]).grid(column=1, row=0, sticky="nsw", pady=10)
+        ttk.Label(self.resultant_canvas, textvariable=self.resultant_vars["y"]).grid(column=3, row=0, sticky="nsw", pady=10)
+        ttk.Label(self.resultant_canvas, textvariable=self.resultant_vars["r"]).grid(column=5, row=0, sticky="nsw", pady=10)
+        ttk.Label(self.resultant_canvas, textvariable=self.resultant_vars["theta"]).grid(column=7, row=0, sticky="nsw", pady=10)
 
         self.fig = Figure()
         self.plot: Axes = self.fig.subplots()
@@ -148,10 +143,10 @@ class BaseWindow(tk.Toplevel):
         Get the resultant of the vectors listed on the table
         """
         self.resultant_vct = sum(self.vector_dict.values()) if len(self.vector_dict) else np.array([0, 0])  # type: ignore
-        self.resultant_x_var.set(value=f"{self.resultant_vct[0]: .4f}")  # type: ignore
-        self.resultant_y_var.set(value=f"{self.resultant_vct[1]: .4f}")  # type: ignore
-        self.resultant_r_var.set(value=f"{np.hypot(*self.resultant_vct): .4f}")
-        self.resultant_theta_var.set(value=f"{np.rad2deg(np.arctan2(self.resultant_vct[1], self.resultant_vct[0])): .4f}")  # type: ignore
+        self.resultant_vars["x"].set(value=f"{self.resultant_vct[0]: .4f}")  # type: ignore
+        self.resultant_vars["y"].set(value=f"{self.resultant_vct[1]: .4f}")  # type: ignore
+        self.resultant_vars["r"].set(value=f"{np.hypot(*self.resultant_vct): .4f}")
+        self.resultant_vars["theta"].set(value=f"{np.rad2deg(np.arctan2(self.resultant_vct[1], self.resultant_vct[0])): .4f}")  # type: ignore
         self.resultant_plot.remove()
         self.resultant_plot = self.plot.quiver(*self.resultant_vct, color="black", scale=1, scale_units="xy", angles="xy")  # type: ignore
         return
@@ -206,9 +201,7 @@ class OneMissingVector(BaseWindow):
         self.missing_vector_frame.grid_columnconfigure(2, weight=1)
         self.missing_vector_frame.grid_columnconfigure(3, weight=3)
 
-        self.missing_name_var: tk.StringVar = tk.StringVar(self)
-        self.missing_req1_var: tk.StringVar = tk.StringVar(self)
-        self.missing_req2_var: tk.StringVar = tk.StringVar(self)
+        self.missing_vector_vars: dict[str, tk.StringVar] = {"name": tk.StringVar(self), "req1": tk.StringVar(self), "req2": tk.StringVar(self)}
         self.missing_coordinate: tk.IntVar = tk.IntVar(self, value=0)
         self.auto_update: tk.IntVar = tk.IntVar(self, value=0)
         self.expected_resultant: np.ndarray = np.array([0, 0])
@@ -223,11 +216,11 @@ class OneMissingVector(BaseWindow):
         ttk.Label(self.missing_vector_frame, text="Y / \u03B8 : ").grid(column=2, row=2, sticky="ew", padx=10)
         ttk.Label(self.missing_vector_frame, text="Expected Resultant").grid(column=0, row=1, columnspan=4, sticky="nw", padx=10, pady=(10, 0))
 
-        self.missing_name_entry = ttk.Entry(self.missing_vector_frame, textvariable=self.missing_name_var)
+        self.missing_name_entry = ttk.Entry(self.missing_vector_frame, textvariable=self.missing_vector_vars["name"])
         self.missing_name_entry.grid(column=1, row=0, columnspan=3, sticky="new", padx=10)
-        self.missing_req1_entry = ttk.Entry(self.missing_vector_frame, textvariable=self.missing_req1_var)
+        self.missing_req1_entry = ttk.Entry(self.missing_vector_frame, textvariable=self.missing_vector_vars["req1"])
         self.missing_req1_entry.grid(column=1, row=2, sticky="ew", padx=10, pady=10)
-        self.missing_req2_entry = ttk.Entry(self.missing_vector_frame, textvariable=self.missing_req2_var)
+        self.missing_req2_entry = ttk.Entry(self.missing_vector_frame, textvariable=self.missing_vector_vars["req2"])
         self.missing_req2_entry.grid(column=3, row=2, sticky="ew", padx=10, pady=10)
 
         self.cartesian = ttk.Radiobutton(self.missing_vector_frame, text="X and Y components", variable=self.missing_coordinate, value=0)
@@ -261,7 +254,7 @@ class OneMissingVector(BaseWindow):
         """
         Add a vector to the table with a unique name and plot the vector into the plane.
         """
-        vector_name = self.name_var.get()
+        vector_name = self.vector_vars["name"].get()
 
         if vector_name == "":
 
@@ -278,14 +271,14 @@ class OneMissingVector(BaseWindow):
         elif self.coordinate.get():
 
             try:
-                r = float(self.req1_var.get())
+                r = float(self.vector_vars["req1"].get())
             except ValueError:
                 showerror("Error", "Value must be a valid decimal number!")
                 self.req1_entry.focus_set()
                 return
 
             try:
-                theta = float(self.req2_var.get())
+                theta = float(self.vector_vars["req2"].get())
             except ValueError:
                 showerror("Error", "Value must be a valid decimal number!")
                 self.req2_entry.focus_set()
@@ -297,14 +290,14 @@ class OneMissingVector(BaseWindow):
         else:
 
             try:
-                x = float(self.req1_var.get())
+                x = float(self.vector_vars["req1"].get())
             except ValueError:
                 showerror("Error", "Value must be a valid decimal number!")
                 self.req1_entry.focus_set()
                 return
 
             try:
-                y = float(self.req2_var.get())
+                y = float(self.vector_vars["req2"].get())
             except ValueError:
                 showerror("Error", "Value must be a valid decimal number!")
                 self.req2_entry.focus_set()
@@ -330,7 +323,7 @@ class OneMissingVector(BaseWindow):
         """
         Checks vector to be removed before removing from list and graph.
         """
-        vector_name = self.missing_name_var.get()
+        vector_name = self.missing_vector_vars["name"].get()
 
         if vector_name in self.tree.selection() and self.auto_update.get():
 
@@ -356,12 +349,10 @@ class OneMissingVector(BaseWindow):
         self.vector_dict.clear()
         self.tree.delete(*self.tree.get_children())
         self.expected_resultant: np.ndarray = np.array([0, 0])
-        self.name_var.set("")
-        self.req1_var.set("")
-        self.req2_var.set("")
-        self.missing_name_var.set("")
-        self.missing_req1_var.set("")
-        self.missing_req2_var.set("")
+        map(lambda x: x.set(""), self.vector_vars.values())
+        self.missing_vector_vars["name"].set("")
+        self.missing_vector_vars["req1"].set("")
+        self.missing_vector_vars["req2"].set("")
         self.missing_x.set("")
         self.missing_y.set("")
         self.missing_r.set("")
@@ -382,7 +373,7 @@ class OneMissingVector(BaseWindow):
         """
         Computes and plots the missing vector on the graph using the listed vectors.
         """
-        vector_name = self.missing_name_var.get()
+        vector_name = self.missing_vector_vars["name"].get()
 
         self.vector_dict.pop(vector_name)
         self.quiver_dict[vector_name].remove()
@@ -404,7 +395,7 @@ class OneMissingVector(BaseWindow):
 
     def get_expected_resultant(self) -> None:
 
-        vector_name = self.missing_name_var.get()
+        vector_name = self.missing_vector_vars["name"].get()
 
         if self.auto_update.get():
 
@@ -425,7 +416,7 @@ class OneMissingVector(BaseWindow):
             elif self.missing_coordinate.get():
 
                 try:
-                    r = float(self.missing_req1_var.get())
+                    r = float(self.missing_vector_vars["req1"].get())
                 except ValueError:
                     showerror("Error", "Value must be a valid decimal number!")
                     self.auto_update.set(0)
@@ -433,7 +424,7 @@ class OneMissingVector(BaseWindow):
                     return
 
                 try:
-                    theta = float(self.missing_req2_var.get())
+                    theta = float(self.missing_vector_vars["req2"].get())
                 except ValueError:
                     showerror("Error", "Value must be a valid decimal number!")
                     self.auto_update.set(0)
@@ -446,7 +437,7 @@ class OneMissingVector(BaseWindow):
             else:
 
                 try:
-                    x = float(self.missing_req1_var.get())
+                    x = float(self.missing_vector_vars["req1"].get())
                 except ValueError:
                     showerror("Error", "Value must be a valid decimal number!")
                     self.auto_update.set(0)
@@ -454,7 +445,7 @@ class OneMissingVector(BaseWindow):
                     return
 
                 try:
-                    y = float(self.missing_req2_var.get())
+                    y = float(self.missing_vector_vars["req2"].get())
                 except ValueError:
                     showerror("Error", "Value must be a valid decimal number!")
                     self.auto_update.set(0)
@@ -542,7 +533,7 @@ class TwoMissingMagnitudes(BaseWindow):
         """
         Add a vector to the table with a unique name and plot the vector into the plane.
         """
-        vector_name = self.name_var.get()
+        vector_name = self.vector_vars["name"].get()
 
         if vector_name == "":
 
@@ -559,14 +550,14 @@ class TwoMissingMagnitudes(BaseWindow):
         elif self.coordinate.get():
 
             try:
-                r = float(self.req1_var.get())
+                r = float(self.vector_vars["req1"].get())
             except ValueError:
                 showerror("Error", "Value must be a valid decimal number!")
                 self.req1_entry.focus_set()
                 return
 
             try:
-                theta = float(self.req2_var.get())
+                theta = float(self.vector_vars["req2"].get())
             except ValueError:
                 showerror("Error", "Value must be a valid decimal number!")
                 self.req2_entry.focus_set()
@@ -578,14 +569,14 @@ class TwoMissingMagnitudes(BaseWindow):
         else:
 
             try:
-                x = float(self.req1_var.get())
+                x = float(self.vector_vars["req1"].get())
             except ValueError:
                 showerror("Error", "Value must be a valid decimal number!")
                 self.req1_entry.focus_set()
                 return
 
             try:
-                y = float(self.req2_var.get())
+                y = float(self.vector_vars["req2"].get())
             except ValueError:
                 showerror("Error", "Value must be a valid decimal number!")
                 self.req2_entry.focus_set()
