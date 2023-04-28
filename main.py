@@ -64,10 +64,12 @@ class BaseWindow(tk.Toplevel):
 
         ttk.Radiobutton(self.vector_frame, text="X and Y components", variable=self.coordinate, value=0).grid(column=0, row=2, columnspan=2, sticky="ew", padx=10, pady=10)
         ttk.Radiobutton(self.vector_frame, text="Magnitude and Direction", variable=self.coordinate, value=1).grid(column=2, row=2, columnspan=2, sticky="ew", padx=10, pady=10)
-        self.add_vector_button = ttk.Button(self.vector_frame, text="Add Vector")
-        self.add_vector_button.grid(column=0, row=3, columnspan=4, sticky="ew", pady=5, padx=10)
-        self.remove_vector_button = ttk.Button(self.vector_frame, text="Remove Vector")
-        self.remove_vector_button.grid(column=0, row=4, columnspan=4, sticky="ew", padx=10, pady=(5, 10))
+        self.add_vector_button = ttk.Button(self.vector_frame, text="Add vector")
+        self.add_vector_button.grid(column=0, row=3, columnspan=4, sticky="ew", padx=10, pady=5)
+        self.remove_vector_button = ttk.Button(self.vector_frame, text="Remove vector")
+        self.remove_vector_button.grid(column=0, row=4, columnspan=4, sticky="ew", padx=10, pady=5)
+        self.clear_all_button = ttk.Button(self.vector_frame, text="Clear all vectors")
+        self.clear_all_button.grid(column=0, row=5, columnspan=4, sticky="ew", padx=10, pady=(5, 10))
 
         self.tree = ttk.Treeview(master=self, columns=("name", "x", "y", "rm", "r_theta"), show="headings")
         self.tree.grid(column=1, row=0, sticky="nsew")
@@ -145,7 +147,7 @@ class BaseWindow(tk.Toplevel):
         """
         Get the resultant of the vectors listed on the table
         """
-        self.resultant_vct = sum(self.vector_dict.values())  # type: ignore
+        self.resultant_vct = sum(self.vector_dict.values()) if len(self.vector_dict) else np.array([0, 0])  # type: ignore
         self.resultant_x_var.set(value=f"{self.resultant_vct[0]: .4f}")  # type: ignore
         self.resultant_y_var.set(value=f"{self.resultant_vct[1]: .4f}")  # type: ignore
         self.resultant_r_var.set(value=f"{np.hypot(*self.resultant_vct): .4f}")
@@ -231,6 +233,7 @@ class OneMissingVector(BaseWindow):
 
         self.add_vector_button.configure(command=self.add_vector)
         self.remove_vector_button.configure(command=self.rm_vector)
+        self.clear_all_button.configure(command=self.clear_all)
         return
 
     def add_vector(self) -> None:
@@ -322,6 +325,34 @@ class OneMissingVector(BaseWindow):
         self.rescale_graph()
         return
 
+    def clear_all(self) -> None:
+        """
+        Clear all vectors from screen and stop auto-update
+        """
+        self.auto_update.set(0)
+        for i in self.quiver_dict.values(): i.remove()
+        self.quiver_dict.clear()
+        self.vector_dict.clear()
+        self.tree.delete(*self.tree.get_children())
+        self.expected_resultant: np.ndarray = np.array([0, 0])
+        self.name_var.set("")
+        self.req1_var.set("")
+        self.req2_var.set("")
+        self.missing_name_var.set("")
+        self.missing_req1_var.set("")
+        self.missing_req2_var.set("")
+        self.coordinate.set(0)
+        self.missing_coordinate.set(0)
+        self.missing_name_entry.configure(state="enabled")
+        self.missing_req1_entry.configure(state="enabled")
+        self.missing_req2_entry.configure(state="enabled")
+        self.cartesian.configure(state="enabled")
+        self.polar.configure(state="enabled")
+
+        self.get_resultant()
+        self.rescale_graph()
+        return
+
     def find_missing_vector(self) -> None:
         """
         Computes and plots the missing vector on the graph using the listed vectors.
@@ -365,6 +396,7 @@ class OneMissingVector(BaseWindow):
                     r = float(self.missing_req1_var.get())
                 except ValueError:
                     showerror("Error", "Value must be a valid decimal number!")
+                    self.auto_update.set(0)
                     self.missing_req1_entry.focus_set()
                     return
 
@@ -372,6 +404,7 @@ class OneMissingVector(BaseWindow):
                     theta = float(self.missing_req2_var.get())
                 except ValueError:
                     showerror("Error", "Value must be a valid decimal number!")
+                    self.auto_update.set(0)
                     self.missing_req2_entry.focus_set()
                     return
 
@@ -384,6 +417,7 @@ class OneMissingVector(BaseWindow):
                     x = float(self.missing_req1_var.get())
                 except ValueError:
                     showerror("Error", "Value must be a valid decimal number!")
+                    self.auto_update.set(0)
                     self.missing_req1_entry.focus_set()
                     return
 
@@ -391,6 +425,7 @@ class OneMissingVector(BaseWindow):
                     y = float(self.missing_req2_var.get())
                 except ValueError:
                     showerror("Error", "Value must be a valid decimal number!")
+                    self.auto_update.set(0)
                     self.missing_req2_entry.focus_set()
                     return
 
