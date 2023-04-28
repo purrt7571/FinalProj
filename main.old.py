@@ -2,15 +2,18 @@ import numpy as np
 import tkinter as tk
 import tkinter.ttk as ttk
 import matplotlib.pyplot as plt
-from matplotlib.backends._backend_tk import NavigationToolbar2Tk
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from tkinter.messagebox import showerror
 
+
 # Close matplotlib figure then close program
+
+
 def on_close() -> None:
     plt.close(fig)
     root.destroy()
     return
+
 
 def rescale_graph() -> None:
     global plot, canvas
@@ -23,6 +26,7 @@ def rescale_graph() -> None:
     canvas.draw()
     return
 
+
 def get_resultant() -> None:
     global resultant, resultant_x, resultant_y, resultant_Rm, resultant_Rtheta, resultant_plt
     resultant = sum(vct.values())
@@ -33,6 +37,7 @@ def get_resultant() -> None:
     resultant_plt.remove()
     resultant_plt = plot.quiver(0, 0, *resultant, color='r', scale=1, scale_units='xy', angles='xy')
     return
+
 
 def add_vector() -> None:
     global plot, vct_plt
@@ -51,9 +56,9 @@ def add_vector() -> None:
     else:
         x = float(requirement1_txtbox.get())
         y = float(requirement2_txtbox.get())
-        r = np.hypot(x,y)
+        r = np.hypot(x, y)
         theta = np.rad2deg(np.arctan2(y, x))
-    vct[vector_name] = np.array([x,y])
+    vct[vector_name] = np.array([x, y])
     vct_plt[vector_name] = plot.quiver(0, 0, x, y, alpha=0.2, color='g', scale=1, scale_units='xy', angles='xy')
     tree.insert("", "end", vector_name, values=(vector_name, "%.6f" % x, "%.6f" % y, "%.6f" % r, "%.6f" % theta))
     get_resultant()
@@ -75,7 +80,7 @@ root.grid_rowconfigure(1, weight=0)
 vct: dict[str, np.ndarray] = {}
 
 vct_plt: dict[str, plt.quiver] = {}
-resultant: np.ndarray = np.array([0,0])
+resultant: np.ndarray = np.array([0, 0])
 resultant_plt: plt.quiver
 resultant_x = tk.StringVar(value="0.0000")
 resultant_y = tk.StringVar(value="0.0000")
@@ -93,10 +98,10 @@ control_frame.grid_rowconfigure(1, weight=0)
 # Setup frame for adding vectors to plot
 add_vector_frame = ttk.Labelframe(control_frame, text="Vector")
 add_vector_frame.grid(column=0, row=0, sticky="new", padx=10, pady=10)
-add_vector_frame.grid_columnconfigure(0,weight=1)
-add_vector_frame.grid_columnconfigure(1,weight=3)
-add_vector_frame.grid_columnconfigure(2,weight=1)
-add_vector_frame.grid_columnconfigure(3,weight=3)
+add_vector_frame.grid_columnconfigure(0, weight=1)
+add_vector_frame.grid_columnconfigure(1, weight=3)
+add_vector_frame.grid_columnconfigure(2, weight=1)
+add_vector_frame.grid_columnconfigure(3, weight=3)
 add_vector_frame.grid_rowconfigure(0, weight=0)
 add_vector_frame.grid_rowconfigure(1, weight=0)
 add_vector_frame.grid_rowconfigure(2, weight=0)
@@ -124,7 +129,7 @@ polar_radio = ttk.Radiobutton(add_vector_frame, text="Polar", variable=coordinat
 polar_radio.grid(column=2, row=2, columnspan=2, sticky="ew", padx=10, pady=10)
 
 add_vector_button = ttk.Button(add_vector_frame, text="Add Vector", command=add_vector)
-add_vector_button.grid(column=0, row=3, columnspan=4, sticky="ew", pady=(5,10), padx=10)
+add_vector_button.grid(column=0, row=3, columnspan=4, sticky="ew", pady=(5, 10), padx=10)
 
 scroll = tk.Scrollbar(control_frame, orient="vertical")
 scroll.grid(column=1, row=0, rowspan=1, sticky="nse")
@@ -132,14 +137,14 @@ scroll.grid(column=1, row=0, rowspan=1, sticky="nse")
 # Display vector values
 resultant_canvas = tk.Frame(root, background="white")
 resultant_canvas.grid(column=1, row=1, sticky="nsew")
-resultant_canvas.grid_columnconfigure(0,weight=1)
-resultant_canvas.grid_columnconfigure(1,weight=3)
-resultant_canvas.grid_columnconfigure(2,weight=1)
-resultant_canvas.grid_columnconfigure(3,weight=3)
-resultant_canvas.grid_columnconfigure(4,weight=1)
-resultant_canvas.grid_columnconfigure(5,weight=3)
-resultant_canvas.grid_columnconfigure(6,weight=1)
-resultant_canvas.grid_columnconfigure(7,weight=3)
+resultant_canvas.grid_columnconfigure(0, weight=1)
+resultant_canvas.grid_columnconfigure(1, weight=3)
+resultant_canvas.grid_columnconfigure(2, weight=1)
+resultant_canvas.grid_columnconfigure(3, weight=3)
+resultant_canvas.grid_columnconfigure(4, weight=1)
+resultant_canvas.grid_columnconfigure(5, weight=3)
+resultant_canvas.grid_columnconfigure(6, weight=1)
+resultant_canvas.grid_columnconfigure(7, weight=3)
 resultant_canvas.grid_rowconfigure(0, weight=0)
 
 tree = ttk.Treeview(root, columns=("c1", "c2", "c3", "c4", "c5"), show="headings")
@@ -159,7 +164,7 @@ result_x_label = ttk.Label(resultant_canvas, text="X = ", background="white")
 result_y_label = ttk.Label(resultant_canvas, text="Y = ", background="white")
 result_Rm_label = ttk.Label(resultant_canvas, text="Rm = ", background="white")
 result_Rtheta_label = ttk.Label(resultant_canvas, text="\u03B8 = ", background="white")
-result_x_label.grid(column=0, row=0, sticky="nsw", padx=(10,0), pady=10)
+result_x_label.grid(column=0, row=0, sticky="nsw", padx=(10, 0), pady=10)
 result_y_label.grid(column=2, row=0, sticky="nsw", pady=10)
 result_Rm_label.grid(column=4, row=0, sticky="nsw", pady=10)
 result_Rtheta_label.grid(column=6, row=0, sticky="nsw", pady=10)
@@ -171,7 +176,7 @@ result_Rtheta = ttk.Label(resultant_canvas, textvariable=resultant_Rtheta, backg
 result_x.grid(column=1, row=0, sticky="nsw", pady=10)
 result_y.grid(column=3, row=0, sticky="nsw", pady=10)
 result_Rm.grid(column=5, row=0, sticky="nsw", pady=10)
-result_Rtheta.grid(column=7, row=0, sticky="nsw", padx=(0,10), pady=10)
+result_Rtheta.grid(column=7, row=0, sticky="nsw", padx=(0, 10), pady=10)
 
 # Setup Graph elements
 fig = plt.figure()
