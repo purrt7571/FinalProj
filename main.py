@@ -201,31 +201,27 @@ class OneMissingVector(BaseWindow):
         self.missing_vector_frame.grid_columnconfigure(2, weight=1)
         self.missing_vector_frame.grid_columnconfigure(3, weight=3)
 
-        self.missing_vector_vars: dict[str, tk.StringVar] = {"name": tk.StringVar(self), "req1": tk.StringVar(self), "req2": tk.StringVar(self)}
-        self.missing_coordinate: tk.IntVar = tk.IntVar(self, value=0)
+        self.expected_resultant_vars: dict[str, tk.StringVar] = {"name": tk.StringVar(self), "req1": tk.StringVar(self), "req2": tk.StringVar(self)}
+        self.expected_resultant_coordinate: tk.IntVar = tk.IntVar(self, value=0)
+        self.missing_vector_vars: dict[str, tk.StringVar] = {"x": tk.StringVar(self), "y": tk.StringVar(self), "r": tk.StringVar(self), "theta": tk.StringVar(self)}
         self.auto_update: tk.IntVar = tk.IntVar(self, value=0)
         self.expected_resultant: np.ndarray = np.array([0, 0])
-
-        self.missing_x: tk.StringVar = tk.StringVar(self)
-        self.missing_y: tk.StringVar = tk.StringVar(self)
-        self.missing_r: tk.StringVar = tk.StringVar(self)
-        self.missing_theta: tk.StringVar = tk.StringVar(self)
 
         ttk.Label(self.missing_vector_frame, text="Vector name: ").grid(column=0, row=0, sticky="nw", padx=10)
         ttk.Label(self.missing_vector_frame, text="X / R : ").grid(column=0, row=2, sticky="ew", padx=10)
         ttk.Label(self.missing_vector_frame, text="Y / \u03B8 : ").grid(column=2, row=2, sticky="ew", padx=10)
         ttk.Label(self.missing_vector_frame, text="Expected Resultant").grid(column=0, row=1, columnspan=4, sticky="nw", padx=10, pady=(10, 0))
 
-        self.missing_name_entry = ttk.Entry(self.missing_vector_frame, textvariable=self.missing_vector_vars["name"])
+        self.missing_name_entry = ttk.Entry(self.missing_vector_frame, textvariable=self.expected_resultant_vars["name"])
         self.missing_name_entry.grid(column=1, row=0, columnspan=3, sticky="new", padx=10)
-        self.missing_req1_entry = ttk.Entry(self.missing_vector_frame, textvariable=self.missing_vector_vars["req1"])
+        self.missing_req1_entry = ttk.Entry(self.missing_vector_frame, textvariable=self.expected_resultant_vars["req1"])
         self.missing_req1_entry.grid(column=1, row=2, sticky="ew", padx=10, pady=10)
-        self.missing_req2_entry = ttk.Entry(self.missing_vector_frame, textvariable=self.missing_vector_vars["req2"])
+        self.missing_req2_entry = ttk.Entry(self.missing_vector_frame, textvariable=self.expected_resultant_vars["req2"])
         self.missing_req2_entry.grid(column=3, row=2, sticky="ew", padx=10, pady=10)
 
-        self.cartesian = ttk.Radiobutton(self.missing_vector_frame, text="X and Y components", variable=self.missing_coordinate, value=0)
+        self.cartesian = ttk.Radiobutton(self.missing_vector_frame, text="X and Y components", variable=self.expected_resultant_coordinate, value=0)
         self.cartesian.grid(column=0, row=3, columnspan=2, sticky="ew", padx=10, pady=10)
-        self.polar = ttk.Radiobutton(self.missing_vector_frame, text="Magnitude and Direction", variable=self.missing_coordinate, value=1)
+        self.polar = ttk.Radiobutton(self.missing_vector_frame, text="Magnitude and Direction", variable=self.expected_resultant_coordinate, value=1)
         self.polar.grid(column=2, row=3, columnspan=2, sticky="ew", padx=10, pady=10)
         ttk.Checkbutton(self.missing_vector_frame, text="Find and Auto-update missing vector", command=self.get_expected_resultant, variable=self.auto_update).grid(column=0, row=4, columnspan=4, sticky="ew", pady=(5, 10), padx=10)
 
@@ -237,13 +233,13 @@ class OneMissingVector(BaseWindow):
         self.result_frame.grid_columnconfigure(3, weight=3)
 
         ttk.Label(self.result_frame, text="X = ").grid(column=0, row=0, sticky="w", padx=20, pady=5)
-        ttk.Label(self.result_frame, textvariable=self.missing_x).grid(column=1, row=0, sticky="e", padx=20, pady=5)
+        ttk.Label(self.result_frame, textvariable=self.missing_vector_vars["x"]).grid(column=1, row=0, sticky="e", padx=20, pady=5)
         ttk.Label(self.result_frame, text="R = ").grid(column=2, row=0, sticky="w", padx=20, pady=5)
-        ttk.Label(self.result_frame, textvariable=self.missing_r).grid(column=3, row=0, sticky="e", padx=20, pady=5)
+        ttk.Label(self.result_frame, textvariable=self.missing_vector_vars["r"]).grid(column=3, row=0, sticky="e", padx=20, pady=5)
         ttk.Label(self.result_frame, text="Y = ").grid(column=0, row=1, sticky="w", padx=20, pady=5)
-        ttk.Label(self.result_frame, textvariable=self.missing_y).grid(column=1, row=1, sticky="e", padx=20, pady=5)
+        ttk.Label(self.result_frame, textvariable=self.missing_vector_vars["y"]).grid(column=1, row=1, sticky="e", padx=20, pady=5)
         ttk.Label(self.result_frame, text="\u03B8 = ").grid(column=2, row=1, sticky="w", padx=20, pady=5)
-        ttk.Label(self.result_frame, textvariable=self.missing_theta).grid(column=3, row=1, sticky="e", padx=20, pady=5)
+        ttk.Label(self.result_frame, textvariable=self.missing_vector_vars["theta"]).grid(column=3, row=1, sticky="e", padx=20, pady=5)
 
         self.add_vector_button.configure(command=self.add_vector)
         self.remove_vector_button.configure(command=self.rm_vector)
@@ -323,7 +319,7 @@ class OneMissingVector(BaseWindow):
         """
         Checks vector to be removed before removing from list and graph.
         """
-        vector_name = self.missing_vector_vars["name"].get()
+        vector_name = self.expected_resultant_vars["name"].get()
 
         if vector_name in self.tree.selection() and self.auto_update.get():
 
@@ -344,21 +340,22 @@ class OneMissingVector(BaseWindow):
         Clear all vectors from screen and stop auto-update
         """
         self.auto_update.set(0)
-        for i in self.quiver_dict.values(): i.remove()
+        for i in self.quiver_dict.values():
+            i.remove()
         self.quiver_dict.clear()
         self.vector_dict.clear()
         self.tree.delete(*self.tree.get_children())
         self.expected_resultant: np.ndarray = np.array([0, 0])
-        map(lambda x: x.set(""), self.vector_vars.values())
-        self.missing_vector_vars["name"].set("")
-        self.missing_vector_vars["req1"].set("")
-        self.missing_vector_vars["req2"].set("")
-        self.missing_x.set("")
-        self.missing_y.set("")
-        self.missing_r.set("")
-        self.missing_theta.set("")
+        for i in self.vector_vars.values():
+            i.set("")
+        for i in self.expected_resultant_vars.values():
+            i.set("")
+        self.missing_vector_vars["x"].set("")
+        self.missing_vector_vars["y"].set("")
+        self.missing_vector_vars["r"].set("")
+        self.missing_vector_vars["theta"].set("")
         self.coordinate.set(0)
-        self.missing_coordinate.set(0)
+        self.expected_resultant_coordinate.set(0)
         self.missing_name_entry.configure(state="enabled")
         self.missing_req1_entry.configure(state="enabled")
         self.missing_req2_entry.configure(state="enabled")
@@ -373,7 +370,7 @@ class OneMissingVector(BaseWindow):
         """
         Computes and plots the missing vector on the graph using the listed vectors.
         """
-        vector_name = self.missing_vector_vars["name"].get()
+        vector_name = self.expected_resultant_vars["name"].get()
 
         self.vector_dict.pop(vector_name)
         self.quiver_dict[vector_name].remove()
@@ -386,16 +383,16 @@ class OneMissingVector(BaseWindow):
         self.vector_dict[vector_name] = missing_vector
         self.quiver_dict[vector_name] = self.plot.quiver(x, y, alpha=0.5, color="r", scale=1, scale_units="xy", angles="xy")
         self.tree.insert("", "end", vector_name, values=(vector_name, f"{x: .6f}", f"{y: .6f}", f"{magnitude: .6f}", f"{direction: .6f}"))
-        self.missing_x.set(f"{x: .6f}")
-        self.missing_y.set(f"{y: .6f}")
-        self.missing_r.set(f"{magnitude: .6f}")
-        self.missing_theta.set(f"{direction: .6f}")
+        self.missing_vector_vars["x"].set(f"{x: .6f}")
+        self.missing_vector_vars["y"].set(f"{y: .6f}")
+        self.missing_vector_vars["r"].set(f"{magnitude: .6f}")
+        self.missing_vector_vars["theta"].set(f"{direction: .6f}")
 
         return
 
     def get_expected_resultant(self) -> None:
 
-        vector_name = self.missing_vector_vars["name"].get()
+        vector_name = self.expected_resultant_vars["name"].get()
 
         if self.auto_update.get():
 
@@ -413,10 +410,10 @@ class OneMissingVector(BaseWindow):
                 self.missing_name_entry.focus_set()
                 return
 
-            elif self.missing_coordinate.get():
+            elif self.expected_resultant_coordinate.get():
 
                 try:
-                    r = float(self.missing_vector_vars["req1"].get())
+                    r = float(self.expected_resultant_vars["req1"].get())
                 except ValueError:
                     showerror("Error", "Value must be a valid decimal number!")
                     self.auto_update.set(0)
@@ -424,7 +421,7 @@ class OneMissingVector(BaseWindow):
                     return
 
                 try:
-                    theta = float(self.missing_vector_vars["req2"].get())
+                    theta = float(self.expected_resultant_vars["req2"].get())
                 except ValueError:
                     showerror("Error", "Value must be a valid decimal number!")
                     self.auto_update.set(0)
@@ -437,7 +434,7 @@ class OneMissingVector(BaseWindow):
             else:
 
                 try:
-                    x = float(self.missing_vector_vars["req1"].get())
+                    x = float(self.expected_resultant_vars["req1"].get())
                 except ValueError:
                     showerror("Error", "Value must be a valid decimal number!")
                     self.auto_update.set(0)
@@ -445,7 +442,7 @@ class OneMissingVector(BaseWindow):
                     return
 
                 try:
-                    y = float(self.missing_vector_vars["req2"].get())
+                    y = float(self.expected_resultant_vars["req2"].get())
                 except ValueError:
                     showerror("Error", "Value must be a valid decimal number!")
                     self.auto_update.set(0)
