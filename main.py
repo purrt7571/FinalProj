@@ -213,6 +213,11 @@ class OneMissingVector(BaseWindow):
         self.auto_update: tk.IntVar = tk.IntVar(self, value=0)
         self.expected_resultant: np.ndarray = np.array([0, 0])
 
+        self.missing_x: tk.StringVar = tk.StringVar(self)
+        self.missing_y: tk.StringVar = tk.StringVar(self)
+        self.missing_r: tk.StringVar = tk.StringVar(self)
+        self.missing_theta: tk.StringVar = tk.StringVar(self)
+
         ttk.Label(self.missing_vector_frame, text="Vector name: ").grid(column=0, row=0, sticky="nw", padx=10)
         ttk.Label(self.missing_vector_frame, text="X / R : ").grid(column=0, row=2, sticky="ew", padx=10)
         ttk.Label(self.missing_vector_frame, text="Y / \u03B8 : ").grid(column=2, row=2, sticky="ew", padx=10)
@@ -230,6 +235,22 @@ class OneMissingVector(BaseWindow):
         self.polar = ttk.Radiobutton(self.missing_vector_frame, text="Magnitude and Direction", variable=self.missing_coordinate, value=1)
         self.polar.grid(column=2, row=3, columnspan=2, sticky="ew", padx=10, pady=10)
         ttk.Checkbutton(self.missing_vector_frame, text="Find and Auto-update missing vector", command=self.get_expected_resultant, variable=self.auto_update).grid(column=0, row=4, columnspan=4, sticky="ew", pady=(5, 10), padx=10)
+
+        self.result_frame = ttk.LabelFrame(master=self.control_panel, text="Missing Vector (Red)")
+        self.result_frame.grid(column=0, row=3, sticky="ew", padx=10, pady=10)
+        self.result_frame.grid_columnconfigure(0, weight=2)
+        self.result_frame.grid_columnconfigure(1, weight=3)
+        self.result_frame.grid_columnconfigure(2, weight=2)
+        self.result_frame.grid_columnconfigure(3, weight=3)
+
+        ttk.Label(self.result_frame, text="X = ").grid(column=0, row=0, sticky="w", padx=20, pady=5)
+        ttk.Label(self.result_frame, textvariable=self.missing_x).grid(column=1, row=0, sticky="e", padx=20, pady=5)
+        ttk.Label(self.result_frame, text="R = ").grid(column=2, row=0, sticky="w", padx=20, pady=5)
+        ttk.Label(self.result_frame, textvariable=self.missing_r).grid(column=3, row=0, sticky="e", padx=20, pady=5)
+        ttk.Label(self.result_frame, text="Y = ").grid(column=0, row=1, sticky="w", padx=20, pady=5)
+        ttk.Label(self.result_frame, textvariable=self.missing_y).grid(column=1, row=1, sticky="e", padx=20, pady=5)
+        ttk.Label(self.result_frame, text="\u03B8 = ").grid(column=2, row=1, sticky="w", padx=20, pady=5)
+        ttk.Label(self.result_frame, textvariable=self.missing_theta).grid(column=3, row=1, sticky="e", padx=20, pady=5)
 
         self.add_vector_button.configure(command=self.add_vector)
         self.remove_vector_button.configure(command=self.rm_vector)
@@ -341,6 +362,10 @@ class OneMissingVector(BaseWindow):
         self.missing_name_var.set("")
         self.missing_req1_var.set("")
         self.missing_req2_var.set("")
+        self.missing_x.set("")
+        self.missing_y.set("")
+        self.missing_r.set("")
+        self.missing_theta.set("")
         self.coordinate.set(0)
         self.missing_coordinate.set(0)
         self.missing_name_entry.configure(state="enabled")
@@ -363,10 +388,17 @@ class OneMissingVector(BaseWindow):
         self.quiver_dict[vector_name].remove()
         self.tree.delete(vector_name)
 
-        missing_vector = self.expected_resultant - sum(self.vector_dict.values())
+        missing_vector: np.ndarray = self.expected_resultant - sum(self.vector_dict.values())
+        x, y = missing_vector[0], missing_vector[1]
+        magnitude = np.hypot(x, y)
+        direction = np.rad2deg(np.arctan2(y, x))
         self.vector_dict[vector_name] = missing_vector
-        self.quiver_dict[vector_name] = self.plot.quiver(*missing_vector, alpha=0.5, color="r", scale=1, scale_units="xy", angles="xy")
-        self.tree.insert("", "end", vector_name, values=(vector_name, "%.6f" % missing_vector[0], "%.6f" % missing_vector[1], "%.6f" % np.hypot(*missing_vector), "%.6f" % np.rad2deg(np.arctan2(missing_vector[1], missing_vector[0]))))
+        self.quiver_dict[vector_name] = self.plot.quiver(x, y, alpha=0.5, color="r", scale=1, scale_units="xy", angles="xy")
+        self.tree.insert("", "end", vector_name, values=(vector_name, f"{x: .6f}", f"{y: .6f}", f"{magnitude: .6f}", f"{direction: .6f}"))
+        self.missing_x.set(f"{x: .6f}")
+        self.missing_y.set(f"{y: .6f}")
+        self.missing_r.set(f"{magnitude: .6f}")
+        self.missing_theta.set(f"{direction: .6f}")
 
         return
 
