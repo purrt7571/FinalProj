@@ -546,6 +546,8 @@ class TwoMissingMagnitudes(BaseWindow):
         ttk.Checkbutton(self.missing_magnitudes_frame, text="Find Missing Magnitudes and auto-update", variable=self.auto_update, command=self.get_expected_resultant).grid(column=0, row=7, columnspan=4, sticky="ew", padx=10, pady=10)
 
         self.add_vector_button.configure(command=self.add_vector)
+        self.remove_vector_button.configure(command=self.rm_vector)
+        self.clear_all_button.configure(command=self.clear_all)
         return
 
     def add_vector(self) -> None:
@@ -617,6 +619,59 @@ class TwoMissingMagnitudes(BaseWindow):
 
         return
 
+    def rm_vector(self) -> None:
+        """
+        Checks vector to be removed before removing from list and graph
+        """
+        vector1_name = self.requirements_vars["v1_name"].get()
+        vector2_name = self.requirements_vars["v2_name"].get()
+
+        if self.auto_update.get() and vector1_name in self.tree.selection():
+
+            showerror("Error", f"Cannot remove \"{vector1_name}\" vector while auto-updating! Please disable auto-update first.")
+            return
+
+        elif self.auto_update.get() and  vector2_name in self.tree.selection():
+            showerror("Error", f"Cannot remove \"{vector2_name}\" vector while auto-updating! Please disable auto-update first.")
+            return
+
+        self.remove_vector()
+
+        if self.auto_update.get():
+            self.find_missing_magnitudes()
+
+        self.get_resultant()
+        self.rescale_graph()
+        return
+
+    def clear_all(self) -> None:
+
+        self.auto_update.set(0)
+        for i in self.quiver_dict.values():
+            i.remove()
+        self.quiver_dict.clear()
+        self.vector_dict.clear()
+        self.tree.delete(*self.tree.get_children())
+        self.expected_resultant: np.ndarray = np.array([0, 0])
+        for i in self.vector_str_vars.values():
+            i.set("")
+        for i in self.requirements_vars.values():
+            i.set("")
+        self.coordinate.set(0)
+        self.missing_coordinate.set(0)
+        self.vector1_name_entry.configure(state="enabled")
+        self.vector1_angle_entry.configure(state="enabled")
+        self.vector2_name_entry.configure(state="enabled")
+        self.vector2_angle_entry.configure(state="enabled")
+        self.resultant_req1_entry.configure(state="enabled")
+        self.resultant_req2_entry.configure(state="enabled")
+        self.cartesian.configure(state="enabled")
+        self.polar.configure(state="enabled")
+
+        self.get_resultant()
+        self.rescale_graph()
+        return
+
     def find_missing_magnitudes(self) -> None:
 
         vector1_name = self.requirements_vars["v1_name"].get()
@@ -685,6 +740,13 @@ class TwoMissingMagnitudes(BaseWindow):
                 showerror("Error", "Vector names must be different!")
                 self.auto_update.set(0)
                 self.vector1_name_entry.focus_set()
+                return
+
+            elif self.requirements_vars["v1_angle"].get() == self.requirements_vars["v2_angle"].get():
+
+                showerror("Error", "Angles must be different! Might result in infinitely solutions or no solution.")
+                self.auto_update.set(0)
+                self.vector2_angle_entry.focus_set()
                 return
 
             try:
@@ -784,8 +846,8 @@ def main():
     root.minsize(300, 100)
     root.grid_columnconfigure(0, weight=1)
 
-    ttk.Button(root, text="Case 1", command=lambda: OneMissingVector(root)).grid(column=0, row=0, sticky="nsew", padx=10, pady=(10, 0))
-    ttk.Button(root, text="Case 2", command=lambda: TwoMissingMagnitudes(root)).grid(column=0, row=1, sticky="nsew", padx=10)
+    ttk.Button(root, text="One Missing Vector", command=lambda: OneMissingVector(root)).grid(column=0, row=0, sticky="nsew", padx=10, pady=(10, 0))
+    ttk.Button(root, text="Two Missing Magnitudes", command=lambda: TwoMissingMagnitudes(root)).grid(column=0, row=1, sticky="nsew", padx=10)
     ttk.Button(root, text="Case 3").grid(column=0, row=2, sticky="nsew", padx=10)
 
     root.mainloop()
