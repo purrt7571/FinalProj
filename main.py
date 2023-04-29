@@ -27,12 +27,21 @@ class BaseWindow(tk.Toplevel):
         self.grid_columnconfigure(2, weight=3)
         self.grid_rowconfigure(0, weight=1)
 
-        self.vector_vars: dict[str, tk.StringVar] = {"name": tk.StringVar(self), "req1": tk.StringVar(self), "req2": tk.StringVar(self)}
+        self.vector_str_vars: dict[str, tk.StringVar] = {
+            "name": tk.StringVar(self),
+            "req1": tk.StringVar(self),
+            "req2": tk.StringVar(self)
+        }
         self.coordinate: tk.IntVar = tk.IntVar(self, value=0)
         self.vector_dict: dict[str, np.ndarray] = {}
         self.quiver_dict: dict[str, Quiver] = {}
         self.resultant_vct: np.ndarray = np.array([0, 0])
-        self.resultant_vars: dict[str, tk.StringVar] = {"x": tk.StringVar(self, "0.0000"), "y": tk.StringVar(self, "0.0000"), "r": tk.StringVar(self, "0.0000"), "theta": tk.StringVar(self, "0.0000")}
+        self.resultant_str_vars: dict[str, tk.StringVar] = {
+            "x": tk.StringVar(self, "0.0000"),
+            "y": tk.StringVar(self, "0.0000"),
+            "r": tk.StringVar(self, "0.0000"),
+            "theta": tk.StringVar(self, "0.0000")
+        }
 
         self.control_panel = tk.Frame(self)
         self.control_panel.grid(column=0, row=0, rowspan=2, sticky="nsew")
@@ -49,11 +58,11 @@ class BaseWindow(tk.Toplevel):
         ttk.Label(self.vector_frame, text="X / R : ").grid(column=0, row=1, sticky="ew", padx=10)
         ttk.Label(self.vector_frame, text="Y / \u03B8 : ").grid(column=2, row=1, sticky="ew", padx=10)
 
-        self.name_entry = ttk.Entry(self.vector_frame, textvariable=self.vector_vars["name"])
+        self.name_entry = ttk.Entry(self.vector_frame, textvariable=self.vector_str_vars["name"])
         self.name_entry.grid(column=1, row=0, columnspan=3, sticky="new", padx=10)
-        self.req1_entry = ttk.Entry(self.vector_frame, textvariable=self.vector_vars["req1"])
+        self.req1_entry = ttk.Entry(self.vector_frame, textvariable=self.vector_str_vars["req1"])
         self.req1_entry.grid(column=1, row=1, sticky="ew", padx=10, pady=10)
-        self.req2_entry = ttk.Entry(self.vector_frame, textvariable=self.vector_vars["req2"])
+        self.req2_entry = ttk.Entry(self.vector_frame, textvariable=self.vector_str_vars["req2"])
         self.req2_entry.grid(column=3, row=1, sticky="ew", padx=10, pady=10)
 
         ttk.Radiobutton(self.vector_frame, text="X and Y components", variable=self.coordinate, value=0).grid(column=0, row=2, columnspan=2, sticky="ew", padx=10, pady=10)
@@ -93,10 +102,10 @@ class BaseWindow(tk.Toplevel):
         ttk.Label(self.resultant_canvas, text="Y=").grid(column=2, row=0, sticky="nsw", pady=10)
         ttk.Label(self.resultant_canvas, text="R=").grid(column=4, row=0, sticky="nsw", pady=10)
         ttk.Label(self.resultant_canvas, text="\u03B8=").grid(column=6, row=0, sticky="nsw", pady=10)
-        ttk.Label(self.resultant_canvas, textvariable=self.resultant_vars["x"]).grid(column=1, row=0, sticky="nsw", pady=10)
-        ttk.Label(self.resultant_canvas, textvariable=self.resultant_vars["y"]).grid(column=3, row=0, sticky="nsw", pady=10)
-        ttk.Label(self.resultant_canvas, textvariable=self.resultant_vars["r"]).grid(column=5, row=0, sticky="nsw", pady=10)
-        ttk.Label(self.resultant_canvas, textvariable=self.resultant_vars["theta"]).grid(column=7, row=0, sticky="nsw", pady=10)
+        ttk.Label(self.resultant_canvas, textvariable=self.resultant_str_vars["x"]).grid(column=1, row=0, sticky="nsw", pady=10)
+        ttk.Label(self.resultant_canvas, textvariable=self.resultant_str_vars["y"]).grid(column=3, row=0, sticky="nsw", pady=10)
+        ttk.Label(self.resultant_canvas, textvariable=self.resultant_str_vars["r"]).grid(column=5, row=0, sticky="nsw", pady=10)
+        ttk.Label(self.resultant_canvas, textvariable=self.resultant_str_vars["theta"]).grid(column=7, row=0, sticky="nsw", pady=10)
 
         self.fig = Figure()
         self.plot: Axes = self.fig.subplots()
@@ -142,10 +151,10 @@ class BaseWindow(tk.Toplevel):
         Get the resultant of the vectors listed on the table
         """
         self.resultant_vct = sum(self.vector_dict.values()) if len(self.vector_dict) else np.array([0, 0])  # type: ignore
-        self.resultant_vars["x"].set(value=f"{self.resultant_vct[0]: .4f}")  # type: ignore
-        self.resultant_vars["y"].set(value=f"{self.resultant_vct[1]: .4f}")  # type: ignore
-        self.resultant_vars["r"].set(value=f"{np.hypot(*self.resultant_vct): .4f}")
-        self.resultant_vars["theta"].set(value=f"{np.rad2deg(np.arctan2(self.resultant_vct[1], self.resultant_vct[0])): .4f}")  # type: ignore
+        self.resultant_str_vars["x"].set(value=f"{self.resultant_vct[0]: .4f}")  # type: ignore
+        self.resultant_str_vars["y"].set(value=f"{self.resultant_vct[1]: .4f}")  # type: ignore
+        self.resultant_str_vars["r"].set(value=f"{np.hypot(*self.resultant_vct): .4f}")
+        self.resultant_str_vars["theta"].set(value=f"{np.rad2deg(np.arctan2(self.resultant_vct[1], self.resultant_vct[0])): .4f}")  # type: ignore
         self.resultant_plot.remove()
         self.resultant_plot = self.plot.quiver(*self.resultant_vct, color="black", scale=1, scale_units="xy", angles="xy")  # type: ignore
         return
@@ -200,9 +209,18 @@ class OneMissingVector(BaseWindow):
         self.missing_vector_frame.grid_columnconfigure(2, weight=1)
         self.missing_vector_frame.grid_columnconfigure(3, weight=3)
 
-        self.expected_resultant_vars: dict[str, tk.StringVar] = {"name": tk.StringVar(self), "req1": tk.StringVar(self), "req2": tk.StringVar(self)}
+        self.expected_resultant_vars: dict[str, tk.StringVar] = {
+            "name": tk.StringVar(self),
+            "req1": tk.StringVar(self),
+            "req2": tk.StringVar(self)
+        }
         self.expected_resultant_coordinate: tk.IntVar = tk.IntVar(self, value=0)
-        self.missing_vector_vars: dict[str, tk.StringVar] = {"x": tk.StringVar(self), "y": tk.StringVar(self), "r": tk.StringVar(self), "theta": tk.StringVar(self)}
+        self.missing_vector_vars: dict[str, tk.StringVar] = {
+            "x": tk.StringVar(self),
+            "y": tk.StringVar(self),
+            "r": tk.StringVar(self),
+            "theta": tk.StringVar(self)
+        }
         self.auto_update: tk.IntVar = tk.IntVar(self, value=0)
         self.expected_resultant: np.ndarray = np.array([0, 0])
 
@@ -249,7 +267,7 @@ class OneMissingVector(BaseWindow):
         """
         Add a vector to the table with a unique name and plot the vector into the plane.
         """
-        vector_name = self.vector_vars["name"].get()
+        vector_name = self.vector_str_vars["name"].get()
 
         if vector_name == "":
 
@@ -266,14 +284,14 @@ class OneMissingVector(BaseWindow):
         elif self.coordinate.get():
 
             try:
-                r = float(self.vector_vars["req1"].get())
+                r = float(self.vector_str_vars["req1"].get())
             except ValueError:
                 showerror("Error", "Value must be a valid decimal number!")
                 self.req1_entry.focus_set()
                 return
 
             try:
-                theta = float(self.vector_vars["req2"].get())
+                theta = float(self.vector_str_vars["req2"].get())
             except ValueError:
                 showerror("Error", "Value must be a valid decimal number!")
                 self.req2_entry.focus_set()
@@ -285,14 +303,14 @@ class OneMissingVector(BaseWindow):
         else:
 
             try:
-                x = float(self.vector_vars["req1"].get())
+                x = float(self.vector_str_vars["req1"].get())
             except ValueError:
                 showerror("Error", "Value must be a valid decimal number!")
                 self.req1_entry.focus_set()
                 return
 
             try:
-                y = float(self.vector_vars["req2"].get())
+                y = float(self.vector_str_vars["req2"].get())
             except ValueError:
                 showerror("Error", "Value must be a valid decimal number!")
                 self.req2_entry.focus_set()
@@ -345,7 +363,7 @@ class OneMissingVector(BaseWindow):
         self.vector_dict.clear()
         self.tree.delete(*self.tree.get_children())
         self.expected_resultant: np.ndarray = np.array([0, 0])
-        for i in self.vector_vars.values():
+        for i in self.vector_str_vars.values():
             i.set("")
         for i in self.expected_resultant_vars.values():
             i.set("")
@@ -373,7 +391,7 @@ class OneMissingVector(BaseWindow):
         self.quiver_dict[vector_name].remove()
         self.tree.delete(vector_name)
 
-        missing_vector: np.ndarray = self.expected_resultant - sum(self.vector_dict.values())
+        missing_vector: np.ndarray = self.expected_resultant - (sum(self.vector_dict.values()) if len(self.vector_dict) else np.array([0, 0]))
         x, y = missing_vector[0], missing_vector[1]
         magnitude = np.hypot(x, y)
         direction = np.rad2deg(np.arctan2(y, x))
@@ -478,13 +496,18 @@ class TwoMissingMagnitudes(BaseWindow):
 
         super().__init__(master, min_width, min_height)
 
-        self.vector1_name_var = tk.StringVar(self)
-        self.vector2_name_var = tk.StringVar(self)
-        self.vector1_angle_var = tk.StringVar(self)
-        self.vector2_angle_var = tk.StringVar(self)
-        self.resultant_req1_var = tk.StringVar(self)
-        self.resultant_req2_var = tk.StringVar(self)
+        self.requirements_vars: dict[str, tk.StringVar] = {
+            "v1_name": tk.StringVar(self),
+            "v1_angle": tk.StringVar(self),
+            "v2_name": tk.StringVar(self),
+            "v2_angle": tk.StringVar(self),
+            "result_req1": tk.StringVar(self),
+            "result_req2": tk.StringVar(self)
+        }
         self.missing_coordinate = tk.IntVar(self, value=0)
+        self.angle_array = np.array([0, 0])
+        self.auto_update = tk.IntVar(self, value=0)
+        self.expected_resultant = np.array([0, 0])
 
         self.missing_magnitudes_frame = ttk.Labelframe(self.control_panel, text="Two Missing Magnitudes (Blue)")
         self.missing_magnitudes_frame.grid(column=0, row=2, sticky="new", padx=10, pady=10)
@@ -503,22 +526,24 @@ class TwoMissingMagnitudes(BaseWindow):
         ttk.Label(self.missing_magnitudes_frame, text="X / Y: ").grid(column=0, row=5, sticky="nw", padx=10)
         ttk.Label(self.missing_magnitudes_frame, text="R / \u03B8: ").grid(column=2, row=5, sticky="nw", padx=10, pady=(3, 13))
 
-        self.vector1_name_entry = ttk.Entry(self.missing_magnitudes_frame, textvariable=self.vector1_name_var)
+        self.vector1_name_entry = ttk.Entry(self.missing_magnitudes_frame, textvariable=self.requirements_vars["v1_name"])
         self.vector1_name_entry.grid(column=1, row=1, sticky="new", padx=10, pady=(3, 0))
-        self.vector1_angle_entry = ttk.Entry(self.missing_magnitudes_frame, textvariable=self.vector1_angle_var)
+        self.vector1_angle_entry = ttk.Entry(self.missing_magnitudes_frame, textvariable=self.requirements_vars["v1_angle"])
         self.vector1_angle_entry.grid(column=3, row=1, sticky="new", padx=10, pady=(3, 13))
-        self.vector2_name_entry = ttk.Entry(self.missing_magnitudes_frame, textvariable=self.vector2_name_var)
+        self.vector2_name_entry = ttk.Entry(self.missing_magnitudes_frame, textvariable=self.requirements_vars["v2_name"])
         self.vector2_name_entry.grid(column=1, row=3, sticky="new", padx=10)
-        self.vector2_angle_entry = ttk.Entry(self.missing_magnitudes_frame, textvariable=self.vector2_angle_var)
+        self.vector2_angle_entry = ttk.Entry(self.missing_magnitudes_frame, textvariable=self.requirements_vars["v2_angle"])
         self.vector2_angle_entry.grid(column=3, row=3, sticky="new", padx=10, pady=(3, 13))
-        self.resultant_req1_entry = ttk.Entry(self.missing_magnitudes_frame, textvariable=self.resultant_req1_var)
+        self.resultant_req1_entry = ttk.Entry(self.missing_magnitudes_frame, textvariable=self.requirements_vars["result_req1"])
         self.resultant_req1_entry.grid(column=1, row=5, sticky="new", padx=10)
-        self.resultant_req2_entry = ttk.Entry(self.missing_magnitudes_frame, textvariable=self.resultant_req2_var)
+        self.resultant_req2_entry = ttk.Entry(self.missing_magnitudes_frame, textvariable=self.requirements_vars["result_req2"])
         self.resultant_req2_entry.grid(column=3, row=5, sticky="new", padx=10, pady=(3, 13))
 
-        ttk.Radiobutton(self.missing_magnitudes_frame, text="X and Y components", variable=self.missing_coordinate, value=0).grid(column=0, row=6, columnspan=2, sticky="ew", padx=10, pady=10)
-        ttk.Radiobutton(self.missing_magnitudes_frame, text="Magnitude and Direction", variable=self.missing_coordinate, value=1).grid(column=2, row=6, columnspan=2, sticky="ew", padx=10, pady=10)
-        ttk.Button(self.missing_magnitudes_frame, text="Find Missing Magnitudes", command=self.find_two_missing_magnitudes).grid(column=0, row=7, columnspan=4, sticky="ew", padx=10, pady=10)
+        self.cartesian = ttk.Radiobutton(self.missing_magnitudes_frame, text="X and Y components", variable=self.missing_coordinate, value=0)
+        self.cartesian.grid(column=0, row=6, columnspan=2, sticky="ew", padx=10, pady=10)
+        self.polar = ttk.Radiobutton(self.missing_magnitudes_frame, text="Magnitude and Direction", variable=self.missing_coordinate, value=1)
+        self.polar.grid(column=2, row=6, columnspan=2, sticky="ew", padx=10, pady=10)
+        ttk.Checkbutton(self.missing_magnitudes_frame, text="Find Missing Magnitudes and auto-update", variable=self.auto_update, command=self.get_expected_resultant).grid(column=0, row=7, columnspan=4, sticky="ew", padx=10, pady=10)
 
         self.add_vector_button.configure(command=self.add_vector)
         return
@@ -527,7 +552,7 @@ class TwoMissingMagnitudes(BaseWindow):
         """
         Add a vector to the table with a unique name and plot the vector into the plane.
         """
-        vector_name = self.vector_vars["name"].get()
+        vector_name = self.vector_str_vars["name"].get()
 
         if vector_name == "":
 
@@ -544,14 +569,14 @@ class TwoMissingMagnitudes(BaseWindow):
         elif self.coordinate.get():
 
             try:
-                r = float(self.vector_vars["req1"].get())
+                r = float(self.vector_str_vars["req1"].get())
             except ValueError:
                 showerror("Error", "Value must be a valid decimal number!")
                 self.req1_entry.focus_set()
                 return
 
             try:
-                theta = float(self.vector_vars["req2"].get())
+                theta = float(self.vector_str_vars["req2"].get())
             except ValueError:
                 showerror("Error", "Value must be a valid decimal number!")
                 self.req2_entry.focus_set()
@@ -563,14 +588,14 @@ class TwoMissingMagnitudes(BaseWindow):
         else:
 
             try:
-                x = float(self.vector_vars["req1"].get())
+                x = float(self.vector_str_vars["req1"].get())
             except ValueError:
                 showerror("Error", "Value must be a valid decimal number!")
                 self.req1_entry.focus_set()
                 return
 
             try:
-                y = float(self.vector_vars["req2"].get())
+                y = float(self.vector_str_vars["req2"].get())
             except ValueError:
                 showerror("Error", "Value must be a valid decimal number!")
                 self.req2_entry.focus_set()
@@ -584,129 +609,171 @@ class TwoMissingMagnitudes(BaseWindow):
         self.quiver_dict[vector_name] = self.plot.quiver(x, y, alpha=0.5, color="g", scale=1, scale_units="xy", angles="xy")
         self.tree.insert("", "end", vector_name, values=(vector_name, f"{x: .6f}", f"{y: .6f}", f"{r: .6f}", f"{theta: .6f}"))
 
+        if self.auto_update.get():
+            self.find_missing_magnitudes()
+
         self.get_resultant()
         self.rescale_graph()
 
         return
 
-    def find_two_missing_magnitudes(self) -> None:
+    def find_missing_magnitudes(self) -> None:
 
-        vector1_name = self.vector1_name_var.get()
-        vector2_name = self.vector2_name_var.get()
-        angle_array = np.array([0, 0])
-        sum_vectors = sum(self.vector_dict.values()) if len(self.vector_dict) else np.array([0, 0])
+        vector1_name = self.requirements_vars["v1_name"].get()
+        vector2_name = self.requirements_vars["v2_name"].get()
 
-        if vector1_name == "":
+        self.vector_dict.pop(vector1_name)
+        self.vector_dict.pop(vector2_name)
+        self.quiver_dict[vector1_name].remove()
+        self.quiver_dict[vector2_name].remove()
+        self.tree.delete(vector1_name)
+        self.tree.delete(vector2_name)
 
-            showerror("Error", "Vector name is empty!")
-            self.vector1_name_entry.focus_set()
-            return
-
-        elif vector1_name in self.quiver_dict:
-
-            showerror("Error", f"Vector \"{vector1_name}\" already exists!")
-            self.vector1_name_entry.focus_set()
-            return
-
-        elif vector2_name == "":
-
-            showerror("Error", "Vector name is empty!")
-            self.vector2_name_entry.focus_set()
-            return
-
-        elif vector2_name in self.quiver_dict:
-
-            showerror("Error", f"Vector \"{vector2_name}\" already exists!")
-            self.vector2_name_entry.focus_set()
-            return
-
-        elif vector1_name == vector2_name:
-
-            showerror("Error", "Vector names must be different!")
-            self.vector1_angle_entry.focus_set()
-            return
-
-        elif self.missing_coordinate.get():
-
-            try:
-                angle_array[0] = float(self.vector1_angle_var.get())
-            except ValueError:
-                showerror("Error", "Value must be a valid decimal number!")
-                self.vector1_angle_entry.focus_set()
-                return
-
-            try:
-                angle_array[1] = float(self.vector2_angle_var.get())
-            except ValueError:
-                showerror("Error", "Value must be a valid decimal number!")
-                self.vector2_angle_entry.focus_set()
-                return
-
-            try:
-                resultant_magnitude = float(self.resultant_req1_var.get())
-            except ValueError:
-                showerror("Error", "Value must be a valid decimal number!")
-                self.resultant_req1_entry.focus_set()
-                return
-
-            try:
-                resultant_angle = float(self.resultant_req2_var.get())
-            except ValueError:
-                showerror("Error", "Value must be a valid decimal number!")
-                self.resultant_req2_entry.focus_set()
-                return
-
-            inverted_matrix = np.linalg.inv(np.array([np.cos(np.radians(angle_array)), np.sin(np.radians(angle_array))]))
-            magnitudes = np.dot(inverted_matrix, np.array([resultant_magnitude * np.cos(np.radians(resultant_angle)), resultant_magnitude * np.sin(np.radians(resultant_angle))]) - sum_vectors)
-
-            x = magnitudes * np.cos(np.radians(angle_array))
-            y = magnitudes * np.sin(np.radians(angle_array))
-
-        else:
-
-            try:
-                angle_array[0] = float(self.vector1_angle_var.get())
-            except ValueError:
-                showerror("Error", "Value must be a valid decimal number!")
-                self.vector1_angle_entry.focus_set()
-                return
-
-            try:
-                angle_array[1] = float(self.vector2_angle_var.get())
-            except ValueError:
-                showerror("Error", "Value must be a valid decimal number!")
-                self.vector2_angle_entry.focus_set()
-                return
-
-            try:
-                resultant_x = float(self.resultant_req1_var.get())
-            except ValueError:
-                showerror("Error", "Value must be a valid decimal number!")
-                self.resultant_req1_entry.focus_set()
-                return
-
-            try:
-                resultant_y = float(self.resultant_req2_var.get())
-            except ValueError:
-                showerror("Error", "Value must be a valid decimal number!")
-                self.resultant_req2_entry.focus_set()
-                return
-
-            inverted_matrix = np.linalg.inv(np.array([np.cos(np.radians(angle_array)), np.sin(np.radians(angle_array))]))
-            magnitudes = np.dot(inverted_matrix, np.array([resultant_x, resultant_y]) - sum_vectors)
-
-            x = magnitudes * np.cos(np.radians(angle_array))
-            y = magnitudes * np.sin(np.radians(angle_array))
-
+        expected_sum: np.ndarray = self.expected_resultant - (sum(self.vector_dict.values()) if len(self.vector_dict) else np.array([0, 0]))
+        angle_rad_array: np.ndarray = np.radians(self.angle_array)
+        matrix = np.array([np.cos(angle_rad_array), np.sin(angle_rad_array)])
+        inverted_matrix = np.linalg.inv(matrix)
+        magnitude = np.dot(inverted_matrix, expected_sum)
+        x = magnitude * np.cos(angle_rad_array)
+        y = magnitude * np.sin(angle_rad_array)
         self.vector_dict[vector1_name] = np.array([x[0], y[0]])
         self.vector_dict[vector2_name] = np.array([x[1], y[1]])
         self.quiver_dict[vector1_name] = self.plot.quiver(x[0], y[0], alpha=0.5, color="b", scale=1, scale_units="xy", angles="xy")
         self.quiver_dict[vector2_name] = self.plot.quiver(x[1], y[1], alpha=0.5, color="b", scale=1, scale_units="xy", angles="xy")
-        self.tree.insert("", "end", values=(vector1_name, "%.6f" % x[0], "%.6f" % y[0], "%.6f" % magnitudes[0], "%.6f" % angle_array[0]))
-        self.tree.insert("", "end", values=(vector2_name, "%.6f" % x[1], "%.6f" % y[1], "%.6f" % magnitudes[1], "%.6f" % angle_array[1]))
+        self.tree.insert("", "end", vector1_name, values=(vector1_name, f"{x[0]: .6f}", f"{y[0]: .6f}", f"{magnitude[0]: .6f}", f"{self.angle_array[0]: .6f}"))
+        self.tree.insert("", "end", vector2_name, values=(vector2_name, f"{x[1]: .6f}", f"{y[1]: .6f}", f"{magnitude[1]: .6f}", f"{self.angle_array[1]: .6f}"))
 
-        self.get_resultant()
-        self.rescale_graph()
+        return
+
+    def get_expected_resultant(self) -> None:
+
+        vector1_name = self.requirements_vars["v1_name"].get()
+        vector2_name = self.requirements_vars["v2_name"].get()
+
+        if self.auto_update.get():
+
+            if vector1_name == "":
+
+                showerror("Error", "Vector name is empty!")
+                self.auto_update.set(0)
+                self.vector1_name_entry.focus_set()
+                return
+
+            elif vector1_name in self.quiver_dict:
+
+                showerror("Error", f"Vector \"{vector1_name}\" already exists!")
+                self.auto_update.set(0)
+                self.vector1_name_entry.focus_set()
+                return
+
+            elif vector2_name == "":
+
+                showerror("Error", "Vector name is empty!")
+                self.auto_update.set(0)
+                self.vector2_name_entry.focus_set()
+                return
+
+            elif vector2_name in self.quiver_dict:
+
+                showerror("Error", f"Vector \"{vector2_name}\" already exists!")
+                self.auto_update.set(0)
+                self.vector2_name_entry.focus_set()
+                return
+
+            elif vector1_name == vector2_name:
+
+                showerror("Error", "Vector names must be different!")
+                self.auto_update.set(0)
+                self.vector1_name_entry.focus_set()
+                return
+
+            try:
+                self.angle_array[0] = float(self.requirements_vars["v1_angle"].get())
+            except ValueError:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.auto_update.set(0)
+                self.vector1_angle_entry.focus_set()
+                return
+
+            try:
+                self.angle_array[1] = float(self.requirements_vars["v2_angle"].get())
+            except ValueError:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.auto_update.set(0)
+                self.vector2_angle_entry.focus_set()
+                return
+
+            if self.missing_coordinate.get():
+
+                try:
+                    resultant_magnitude = float(self.requirements_vars["result_req1"].get())
+                except ValueError:
+                    showerror("Error", "Value must be a valid decimal number!")
+                    self.auto_update.set(0)
+                    self.resultant_req1_entry.focus_set()
+                    return
+
+                try:
+                    resultant_angle = float(self.requirements_vars["result_req2"].get())
+                except ValueError:
+                    showerror("Error", "Value must be a valid decimal number!")
+                    self.auto_update.set(0)
+                    self.resultant_req2_entry.focus_set()
+                    return
+
+                resultant_x = resultant_magnitude * np.cos(np.radians(resultant_angle))
+                resultant_y = resultant_magnitude * np.sin(np.radians(resultant_angle))
+
+            else:
+
+                try:
+                    resultant_x = float(self.requirements_vars["result_req1"].get())
+                except ValueError:
+                    showerror("Error", "Value must be a valid decimal number!")
+                    self.auto_update.set(0)
+                    self.resultant_req1_entry.focus_set()
+                    return
+
+                try:
+                    resultant_y = float(self.requirements_vars["result_req2"].get())
+                except ValueError:
+                    showerror("Error", "Value must be a valid decimal number!")
+                    self.auto_update.set(0)
+                    self.resultant_req2_entry.focus_set()
+                    return
+
+            self.vector1_name_entry.configure(state="disabled")
+            self.vector1_angle_entry.configure(state="disabled")
+            self.vector2_name_entry.configure(state="disabled")
+            self.vector2_angle_entry.configure(state="disabled")
+            self.resultant_req1_entry.configure(state="disabled")
+            self.resultant_req2_entry.configure(state="disabled")
+            self.cartesian.configure(state="disabled")
+            self.polar.configure(state="disabled")
+
+            self.vector_dict[vector1_name] = np.array([0, 0])
+            self.vector_dict[vector2_name] = np.array([0, 0])
+            self.quiver_dict[vector1_name] = self.plot.quiver(0, 0)
+            self.quiver_dict[vector2_name] = self.plot.quiver(0, 0)
+            self.tree.insert("", "end", vector1_name, values=(vector1_name, 0, 0, 0, 0))
+            self.tree.insert("", "end", vector2_name, values=(vector2_name, 0, 0, 0, 0))
+            self.expected_resultant = np.array([resultant_x, resultant_y])
+
+            self.find_missing_magnitudes()
+            self.get_resultant()
+            self.rescale_graph()
+
+        else:
+
+            self.vector1_name_entry.configure(state="enabled")
+            self.vector1_angle_entry.configure(state="enabled")
+            self.vector2_name_entry.configure(state="enabled")
+            self.vector2_angle_entry.configure(state="enabled")
+            self.resultant_req1_entry.configure(state="enabled")
+            self.resultant_req2_entry.configure(state="enabled")
+            self.cartesian.configure(state="enabled")
+            self.polar.configure(state="enabled")
+
         return
 
 
