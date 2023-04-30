@@ -74,8 +74,9 @@ class BaseWindow(tk.Toplevel):
         self.clear_all_button = ttk.Button(self.vector_frame, text="Clear all vectors")
         self.clear_all_button.grid(column=0, row=5, columnspan=4, sticky="ew", padx=10, pady=(5, 10))
 
-        self.tree = ttk.Treeview(master=self, columns=("name", "x", "y", "rm", "r_theta"), show="headings")
+        self.tree = ttk.Treeview(master=self, columns=("name", "x", "y", "rm", "r_theta"), show="tree headings")
         self.tree.grid(column=1, row=0, sticky="nsew")
+        self.tree.column("#0", width=70, anchor="w")
         self.tree.column("name", width=50, anchor="w")
         self.tree.column("x", width=70, anchor="e")
         self.tree.column("y", width=70, anchor="e")
@@ -86,6 +87,12 @@ class BaseWindow(tk.Toplevel):
         self.tree.heading("y", text="Y")
         self.tree.heading("rm", text="R")
         self.tree.heading("r_theta", text="\u03B8")
+
+        self.tree_entries = {
+            "given": self.tree.insert("", "end", text="Given"),
+            "missing": self.tree.insert("", "end", text="Missing"),
+            "other": self.tree.insert("", "end", text="Other")
+            }
 
         self.resultant_canvas = tk.Frame(self)
         self.resultant_canvas.grid(column=1, row=1, sticky="nsew", padx=10)
@@ -130,7 +137,15 @@ class BaseWindow(tk.Toplevel):
         """
         selected = self.tree.selection()
 
-        if len(selected):
+        if len(selected) == 0:
+
+            showerror("Error", "No vector selected on the table!")
+
+        elif selected[0] in self.tree_entries.values():
+
+            showerror("Error", "Cannot remove top category")
+
+        else:
 
             for name in selected:
                 self.vector_dict.pop(name)
@@ -139,10 +154,6 @@ class BaseWindow(tk.Toplevel):
 
             self.get_resultant()
             self.rescale_graph()
-
-        else:
-
-            showerror("Error", "No vector selected on the table!")
 
         return
 
@@ -281,6 +292,12 @@ class OneMissingVector(BaseWindow):
             self.name_entry.focus_set()
             return
 
+        elif vector_name in self.tree_entries.values():
+
+            showerror("Error", f"{self.tree_entries['given']}, {self.tree_entries['missing']}, and {self.tree_entries['other']} are currently reserved for the main categories.")
+            self.name_entry.focus_set()
+            return
+
         elif self.coordinate.get():
 
             try:
@@ -322,7 +339,8 @@ class OneMissingVector(BaseWindow):
 
         self.vector_dict[vector_name] = np.array([x, y])
         self.quiver_dict[vector_name] = self.plot.quiver(x, y, alpha=0.5, color="g", scale=1, scale_units="xy", angles="xy")
-        self.tree.insert("", "end", vector_name, values=(vector_name, f"{x: .6f}", f"{y: .6f}", f"{r: .6f}", f"{theta: .6f}"))
+        self.tree.insert(self.tree_entries["given"], "end", vector_name, values=(vector_name, f"{x: .6f}", f"{y: .6f}", f"{r: .6f}", f"{theta: .6f}"))
+        self.tree.item(self.tree_entries["given"], open=True)
 
         if self.auto_update.get():
             self.find_missing_vector()
@@ -361,7 +379,7 @@ class OneMissingVector(BaseWindow):
             i.remove()
         self.quiver_dict.clear()
         self.vector_dict.clear()
-        self.tree.delete(*self.tree.get_children())
+        self.tree.delete(*self.tree.get_children(""))
         self.expected_resultant: np.ndarray = np.array([0, 0])
         for i in self.vector_str_vars.values():
             i.set("")
@@ -376,6 +394,12 @@ class OneMissingVector(BaseWindow):
         self.missing_req2_entry.configure(state="enabled")
         self.cartesian.configure(state="enabled")
         self.polar.configure(state="enabled")
+
+        self.tree_entries = {
+            "given": self.tree.insert("", "end", text="Given"),
+            "missing": self.tree.insert("", "end", text="Missing"),
+            "other": self.tree.insert("", "end", text="Other")
+        }
 
         self.get_resultant()
         self.rescale_graph()
@@ -397,7 +421,8 @@ class OneMissingVector(BaseWindow):
         direction = np.rad2deg(np.arctan2(y, x))
         self.vector_dict[vector_name] = missing_vector
         self.quiver_dict[vector_name] = self.plot.quiver(x, y, alpha=0.5, color="r", scale=1, scale_units="xy", angles="xy")
-        self.tree.insert("", "end", vector_name, values=(vector_name, f"{x: .6f}", f"{y: .6f}", f"{magnitude: .6f}", f"{direction: .6f}"))
+        self.tree.insert(self.tree_entries["missing"], "end", vector_name, values=(vector_name, f"{x: .6f}", f"{y: .6f}", f"{magnitude: .6f}", f"{direction: .6f}"))
+        self.tree.item(self.tree_entries["missing"], open=True)
         self.missing_vector_vars["x"].set(f"{x: .6f}")
         self.missing_vector_vars["y"].set(f"{y: .6f}")
         self.missing_vector_vars["r"].set(f"{magnitude: .6f}")
@@ -421,6 +446,13 @@ class OneMissingVector(BaseWindow):
             elif vector_name in self.vector_dict:
 
                 showerror("Error", f"Vector \"{vector_name}\" already exists!")
+                self.auto_update.set(0)
+                self.missing_name_entry.focus_set()
+                return
+
+            elif vector_name in self.tree_entries.values():
+
+                showerror("Error",f"{self.tree_entries['given']}, {self.tree_entries['missing']}, and {self.tree_entries['other']} are currently reserved for the main categories.")
                 self.auto_update.set(0)
                 self.missing_name_entry.focus_set()
                 return
@@ -472,7 +504,7 @@ class OneMissingVector(BaseWindow):
 
             self.vector_dict[vector_name] = np.array([0, 0])
             self.quiver_dict[vector_name] = self.plot.quiver(0, 0)
-            self.tree.insert("", "end", vector_name, values=(vector_name, 0, 0, 0, 0))
+            self.tree.insert(self.tree_entries["missing"], "end", vector_name, values=(vector_name, 0, 0, 0, 0))
             self.expected_resultant = np.array([x, y])
 
             self.find_missing_vector()
