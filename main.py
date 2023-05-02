@@ -18,7 +18,7 @@ class BaseWindow(tk.Toplevel):
     Base window for each case with a control panel, table, resultant, and graphing plane.
     """
 
-    def __init__(self, master: tk.Tk, min_width: int = 1500, min_height: int = 900) -> None:
+    def __init__(self, master: tk.Tk, min_width: int = 900, min_height: int = 700) -> None:
 
         super().__init__(master=master)
         self.title("VectorSim")
@@ -211,7 +211,7 @@ class BaseWindow(tk.Toplevel):
 class ResultantWindow(BaseWindow):
 
     """Window Class made for getting the resultant of the given vectors"""
-    def __init__(self, master: tk.Tk, min_width: int = 1500, min_height: int = 900) -> None:
+    def __init__(self, master: tk.Tk, min_width: int = 900, min_height: int = 700) -> None:
         super().__init__(master, min_width, min_height)
 
         self.resultant_frame = ttk.LabelFrame(self.control_panel, text="Resultant (Black)")
@@ -311,6 +311,7 @@ class ResultantWindow(BaseWindow):
         self.tree.insert(self.tree_entries["given"], "end", vector_name, values=(vector_name, f"{x: .6f}", f"{y: .6f}", f"{r: .6f}", f"{theta: .6f}"))
         self.tree.item(self.tree_entries["given"], open=True)
 
+        # noinspection SpellCheckingInspection
         rx, ry, rm, rtheta = self.get_resultant()  # type: ignore
 
         self.result_str_vars["x"].set(f"{rx: .6f}")  # type: ignore
@@ -322,6 +323,7 @@ class ResultantWindow(BaseWindow):
 
         return
 
+    # noinspection SpellCheckingInspection
     def rm_vector(self) -> None:
         
         self.remove_vector()
@@ -342,7 +344,7 @@ class OneMissingVector(BaseWindow):
     """
     Window Class for finding one vector with missing angle and magnitude.
     """
-    def __init__(self, master: tk.Tk, min_width: int = 1500, min_height: int = 900) -> None:
+    def __init__(self, master: tk.Tk, min_width: int = 900, min_height: int = 700) -> None:
 
         super().__init__(master, min_width, min_height)
 
@@ -652,7 +654,7 @@ class OneMissingVector(BaseWindow):
 
 class TwoMissingMagnitudes(BaseWindow):
 
-    def __init__(self, master: tk.Tk, min_width: int = 1500, min_height: int = 900) -> None:
+    def __init__(self, master: tk.Tk, min_width: int = 900, min_height: int = 700) -> None:
 
         super().__init__(master, min_width, min_height)
 
