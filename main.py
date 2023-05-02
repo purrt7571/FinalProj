@@ -157,18 +157,22 @@ class BaseWindow(tk.Toplevel):
 
         return
 
-    def get_resultant(self) -> None:
+    def get_resultant(self) -> tuple[float, float, float, float]:
         """
         Get the resultant of the vectors listed on the table
         """
         self.resultant_vct = sum(self.vector_dict.values()) if len(self.vector_dict) else np.array([0, 0])  # type: ignore
-        self.resultant_str_vars["x"].set(value=f"{self.resultant_vct[0]: .4f}")  # type: ignore
-        self.resultant_str_vars["y"].set(value=f"{self.resultant_vct[1]: .4f}")  # type: ignore
-        self.resultant_str_vars["r"].set(value=f"{np.hypot(*self.resultant_vct): .4f}")
-        self.resultant_str_vars["theta"].set(value=f"{np.rad2deg(np.arctan2(self.resultant_vct[1], self.resultant_vct[0])): .4f}")  # type: ignore
+        x: float = self.resultant_vct[0]
+        y: float = self.resultant_vct[1]
+        r: float = np.hypot(*self.resultant_vct)
+        theta: float = np.rad2deg(np.arctan2(self.resultant_vct[1], self.resultant_vct[0]))
+        self.resultant_str_vars["x"].set(value=f"{x: .4f}")  # type: ignore
+        self.resultant_str_vars["y"].set(value=f"{y: .4f}")  # type: ignore
+        self.resultant_str_vars["r"].set(value=f"{r: .4f}")
+        self.resultant_str_vars["theta"].set(value=f"{theta: .4f}")  # type: ignore
         self.resultant_plot.remove()
         self.resultant_plot = self.plot.quiver(*self.resultant_vct, color="black", scale=1, scale_units="xy", angles="xy")  # type: ignore
-        return
+        return x, y, r, theta
 
     def rescale_graph(self) -> None:
         """
@@ -202,6 +206,135 @@ class BaseWindow(tk.Toplevel):
         self.master.focus_set()
         self.destroy()
         return
+    
+
+class ResultantWindow(BaseWindow):
+
+    """Window Class made for getting the resultant of the given vectors"""
+    def __init__(self, master: tk.Tk, min_width: int = 1500, min_height: int = 900) -> None:
+        super().__init__(master, min_width, min_height)
+
+        self.resultant_frame = ttk.LabelFrame(self.control_panel, text="Resultant (Black)")
+        self.resultant_frame.grid(column=0, row=2, sticky="new", padx=10, pady=10)
+        self.resultant_frame.grid_columnconfigure(0, weight=1)
+        self.resultant_frame.grid_columnconfigure(1, weight=1)
+        self.resultant_frame.grid_columnconfigure(2, weight=1)
+        self.resultant_frame.grid_columnconfigure(3, weight=1)
+        self.resultant_frame.grid_rowconfigure(0, weight=1)
+        self.resultant_frame.grid_rowconfigure(1, weight=1)
+
+        self.result_str_vars: dict[str, tk.StringVar] = {
+            "x": tk.StringVar(self, "0.000000"),
+            "y": tk.StringVar(self, "0.000000"),
+            "r": tk.StringVar(self, "0.000000"),
+            "theta": tk.StringVar(self, "0.000000")
+        }
+
+        ttk.Label(self.resultant_frame, text="X = ").grid(column=0, row=0, sticky="w", padx=20, pady=5)
+        ttk.Label(self.resultant_frame, textvariable=self.result_str_vars["x"]).grid(column=1, row=0, sticky="e", padx=20, pady=5)
+        ttk.Label(self.resultant_frame, text="R = ").grid(column=2, row=0, sticky="w", padx=20, pady=5)
+        ttk.Label(self.resultant_frame, textvariable=self.result_str_vars["r"]).grid(column=3, row=0, sticky="e", padx=20, pady=5)
+        ttk.Label(self.resultant_frame, text="Y = ").grid(column=0, row=1, sticky="w", padx=20, pady=5)
+        ttk.Label(self.resultant_frame, textvariable=self.result_str_vars["y"]).grid(column=1, row=1, sticky="e", padx=20, pady=5)
+        ttk.Label(self.resultant_frame, text="\u03B8 = ").grid(column=2, row=1, sticky="w", padx=20, pady=5)
+        ttk.Label(self.resultant_frame, textvariable=self.result_str_vars["theta"]).grid(column=3, row=1, sticky="e", padx=20, pady=5)
+
+        self.add_vector_button.configure(command=self.add_vector)
+        self.remove_vector_button.configure(command=self.rm_vector)
+        return
+    
+    def add_vector(self) -> None:
+        """
+        Add a vector to the table with a unique name and plot the vector into the plane.
+        """
+        vector_name = self.vector_str_vars["name"].get()
+
+        if vector_name == "":
+
+            showerror("Error", "Vector name is empty!")
+            self.name_entry.focus_set()
+            return
+
+        elif vector_name in self.vector_dict:
+
+            showerror("Error", f"Vector \"{vector_name}\" already exists!")
+            self.name_entry.focus_set()
+            return
+
+        elif vector_name in self.tree_entries.values():
+
+            showerror("Error", f"{self.tree_entries['given']}, {self.tree_entries['missing']}, and {self.tree_entries['other']} are currently reserved for the main categories.")
+            self.name_entry.focus_set()
+            return
+
+        elif self.coordinate.get():
+
+            try:
+                r = float(self.vector_str_vars["req1"].get())
+            except ValueError:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.req1_entry.focus_set()
+                return
+
+            try:
+                theta = float(self.vector_str_vars["req2"].get())
+            except ValueError:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.req2_entry.focus_set()
+                return
+
+            x = r * np.cos(np.radians(theta))
+            y = r * np.sin(np.radians(theta))
+
+        else:
+
+            try:
+                x = float(self.vector_str_vars["req1"].get())
+            except ValueError:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.req1_entry.focus_set()
+                return
+
+            try:
+                y = float(self.vector_str_vars["req2"].get())
+            except ValueError:
+                showerror("Error", "Value must be a valid decimal number!")
+                self.req2_entry.focus_set()
+                return
+
+            r = np.hypot(x, y)
+            theta_rad = np.arctan2(y, x)
+            theta = np.rad2deg(theta_rad)
+
+        self.vector_dict[vector_name] = np.array([x, y])
+        self.quiver_dict[vector_name] = self.plot.quiver(x, y, alpha=0.5, color="g", scale=1, scale_units="xy", angles="xy")
+        self.tree.insert(self.tree_entries["given"], "end", vector_name, values=(vector_name, f"{x: .6f}", f"{y: .6f}", f"{r: .6f}", f"{theta: .6f}"))
+        self.tree.item(self.tree_entries["given"], open=True)
+
+        rx, ry, rm, rtheta = self.get_resultant()  # type: ignore
+
+        self.result_str_vars["x"].set(f"{rx: .6f}")  # type: ignore
+        self.result_str_vars["y"].set(f"{ry: .6f}")  # type: ignore
+        self.result_str_vars["r"].set(f"{rm: .6f}")
+        self.result_str_vars["theta"].set(f"{rtheta: .6f}")  # type: ignore
+
+        self.rescale_graph()
+
+        return
+
+    def rm_vector(self) -> None:
+        
+        self.remove_vector()
+        rx, ry, rm, rtheta = self.get_resultant()  # type: ignore
+
+        self.result_str_vars["x"].set(f"{rx: .6f}")  # type: ignore
+        self.result_str_vars["y"].set(f"{ry: .6f}")  # type: ignore
+        self.result_str_vars["r"].set(f"{rm: .6f}")
+        self.result_str_vars["theta"].set(f"{rtheta: .6f}")  # type: ignore
+
+        self.rescale_graph()
+        return
+
 
 
 class OneMissingVector(BaseWindow):
@@ -379,7 +512,8 @@ class OneMissingVector(BaseWindow):
             i.remove()
         self.quiver_dict.clear()
         self.vector_dict.clear()
-        self.tree.delete(*self.tree.get_children(""))
+        self.tree.delete(*self.tree.get_children(self.tree_entries["given"]))
+        self.tree.delete(*self.tree.get_children(self.tree_entries["missing"]))
         self.expected_resultant: np.ndarray = np.array([0, 0])
         for i in self.vector_str_vars.values():
             i.set("")
@@ -394,12 +528,6 @@ class OneMissingVector(BaseWindow):
         self.missing_req2_entry.configure(state="enabled")
         self.cartesian.configure(state="enabled")
         self.polar.configure(state="enabled")
-
-        self.tree_entries = {
-            "given": self.tree.insert("", "end", text="Given"),
-            "missing": self.tree.insert("", "end", text="Missing"),
-            "other": self.tree.insert("", "end", text="Other")
-        }
 
         self.get_resultant()
         self.rescale_graph()
@@ -641,7 +769,8 @@ class TwoMissingMagnitudes(BaseWindow):
 
         self.vector_dict[vector_name] = np.array([x, y])
         self.quiver_dict[vector_name] = self.plot.quiver(x, y, alpha=0.5, color="g", scale=1, scale_units="xy", angles="xy")
-        self.tree.insert("", "end", vector_name, values=(vector_name, f"{x: .6f}", f"{y: .6f}", f"{r: .6f}", f"{theta: .6f}"))
+        self.tree.insert(self.tree_entries["given"], "end", vector_name, values=(vector_name, f"{x: .6f}", f"{y: .6f}", f"{r: .6f}", f"{theta: .6f}"))
+        self.tree.item(self.tree_entries["given"], open=True)
 
         if self.auto_update.get():
             self.find_missing_magnitudes()
@@ -683,7 +812,8 @@ class TwoMissingMagnitudes(BaseWindow):
             i.remove()
         self.quiver_dict.clear()
         self.vector_dict.clear()
-        self.tree.delete(*self.tree.get_children())
+        self.tree.delete(*self.tree.get_children(self.tree_entries["given"]))
+        self.tree.delete(*self.tree.get_children(self.tree_entries["missing"]))
         self.expected_resultant: np.ndarray = np.array([0, 0])
         for i in self.vector_str_vars.values():
             i.set("")
@@ -726,9 +856,10 @@ class TwoMissingMagnitudes(BaseWindow):
         self.vector_dict[vector1_name] = np.array([x[0], y[0]])
         self.vector_dict[vector2_name] = np.array([x[1], y[1]])
         self.quiver_dict[vector1_name] = self.plot.quiver(x[0], y[0], alpha=0.5, color="b", scale=1, scale_units="xy", angles="xy")
-        self.quiver_dict[vector2_name] = self.plot.quiver(x[1], y[1], alpha=0.5, color="b", scale=1, scale_units="xy", angles="xy")
-        self.tree.insert("", "end", vector1_name, values=(vector1_name, f"{x[0]: .6f}", f"{y[0]: .6f}", f"{magnitude[0]: .6f}", f"{self.angle_array[0]: .6f}"))
-        self.tree.insert("", "end", vector2_name, values=(vector2_name, f"{x[1]: .6f}", f"{y[1]: .6f}", f"{magnitude[1]: .6f}", f"{self.angle_array[1]: .6f}"))
+        self.quiver_dict[vector2_name] = self.plot.quiver(x[1], y[1], alpha=0.5, color="orange", scale=1, scale_units="xy", angles="xy")
+        self.tree.insert(self.tree_entries["missing"], "end", vector1_name, values=(vector1_name, f"{x[0]: .6f}", f"{y[0]: .6f}", f"{magnitude[0]: .6f}", f"{self.angle_array[0]: .6f}"))
+        self.tree.insert(self.tree_entries["missing"], "end", vector2_name, values=(vector2_name, f"{x[1]: .6f}", f"{y[1]: .6f}", f"{magnitude[1]: .6f}", f"{self.angle_array[1]: .6f}"))
+        self.tree.item(self.tree_entries["missing"], open=True)
 
         return
 
@@ -849,8 +980,8 @@ class TwoMissingMagnitudes(BaseWindow):
             self.vector_dict[vector2_name] = np.array([0, 0])
             self.quiver_dict[vector1_name] = self.plot.quiver(0, 0)
             self.quiver_dict[vector2_name] = self.plot.quiver(0, 0)
-            self.tree.insert("", "end", vector1_name, values=(vector1_name, 0, 0, 0, 0))
-            self.tree.insert("", "end", vector2_name, values=(vector2_name, 0, 0, 0, 0))
+            self.tree.insert(self.tree_entries["missing"], "end", vector1_name, values=(vector1_name, 0, 0, 0, 0))
+            self.tree.insert(self.tree_entries["missing"], "end", vector2_name, values=(vector2_name, 0, 0, 0, 0))
             self.expected_resultant = np.array([resultant_x, resultant_y])
 
             self.find_missing_magnitudes()
@@ -875,12 +1006,13 @@ def main():
 
     root = HdpiTk()
     root.title("VectorSim")
-    root.minsize(300, 100)
+    root.minsize(300, 200)
     root.grid_columnconfigure(0, weight=1)
 
-    ttk.Button(root, text="One Missing Vector", command=lambda: OneMissingVector(root)).grid(column=0, row=0, sticky="nsew", padx=10, pady=(10, 0))
-    ttk.Button(root, text="Two Missing Magnitudes", command=lambda: TwoMissingMagnitudes(root)).grid(column=0, row=1, sticky="nsew", padx=10)
-    ttk.Button(root, text="Case 3").grid(column=0, row=2, sticky="nsew", padx=10)
+    ttk.Button(root, text="Resultant Vector", command=lambda: ResultantWindow(root)).grid(column=0, row=0, sticky="nsew", padx=10, pady=(10, 0))
+    ttk.Button(root, text="One Missing Vector", command=lambda: OneMissingVector(root)).grid(column=0, row=1, sticky="nsew", padx=10)
+    ttk.Button(root, text="Two Missing Magnitudes", command=lambda: TwoMissingMagnitudes(root)).grid(column=0, row=2, sticky="nsew", padx=10)
+    ttk.Button(root, text="Case 3").grid(column=0, row=3, sticky="nsew", padx=10)
 
     root.mainloop()
     return
