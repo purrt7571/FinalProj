@@ -927,17 +927,10 @@ class TwoMissingDirections(BaseWindow):
         self.polar = ttk.Radiobutton(self.missing_angle_frame, text="Magnitude and Direction", variable=self.missing_coordinate, value=1)
         self.polar.grid(column=2, row=6, columnspan=2, sticky="ew", padx=10, pady=10)
 
-        #Add get_resultant command
-        ttk.Checkbutton(self.missing_angle_frame, text="Find Missing Directions and auto-update", variable=self.auto_update).grid(column=0, row=7, columnspan=4, sticky="ew", padx=10, pady=10)
-
-        #Add add_vector command
+        ttk.Checkbutton(self.missing_angle_frame, text="Find Missing Directions and auto-update", variable=self.auto_update, command= self.get_resultant).grid(column=0, row=7, columnspan=4, sticky="ew", padx=10, pady=10)
         self.add_vector_button.configure(command=self.add_vector)
-
-        #Add rm_vector command
-        self.remove_vector_button.configure()
-
-        #Add clear_all command
-        self.clear_all_button.configure()
+        self.remove_vector_button.configure(command=self.rm_vector)
+        self.clear_all_button.configure(command=self.clear_all)
         return
 
     def add_vector(self) -> None:
@@ -1002,7 +995,7 @@ class TwoMissingDirections(BaseWindow):
         self.tree.insert("", "end", vector_name, values=(vector_name, f"{x: .6f}", f"{y: .6f}", f"{r: .6f}", f"{theta: .6f}"))
 
         if self.auto_update.get():
-            #self.find_missing_directions()
+            self.find_missing_directions()
             pass
 
         self.get_resultant()
@@ -1029,8 +1022,7 @@ class TwoMissingDirections(BaseWindow):
         self.remove_vector()
 
         if self.auto_update.get():
-            pass
-            #self.find_missing_directions()
+            self.find_missing_directions()
 
         self.get_resultant()
         self.rescale_graph()
@@ -1080,28 +1072,26 @@ class TwoMissingDirections(BaseWindow):
         expected_sum_magnitude = np.hypot(expected_sum[0], expected_sum[1])
         expected_sum_angle = np.arctan2(expected_sum[1], expected_sum[0])
 
-        magnitude_1 = self.requirements_vars["v1_magnitude"]
-        magnitude_2 = self.requirements_vars["v2_magnitude"]
-
-        try:
-            angle2_1 = expected_sum_angle + np.arccos((expected_sum_magnitude**2 + magnitude_2**2 - magnitude_1**2), 2*expected_sum_magnitude*magnitude_2)
-            angle2_2 = expected_sum_angle - np.arccos((expected_sum_magnitude**2 + magnitude_2**2 - magnitude_1**2), 2*expected_sum_magnitude*magnitude_2)
-        except RuntimeWarning:
-            # Lagay ng showerror
-            pass
+        # try:
+        angle2_1 = expected_sum_angle + np.arccos((expected_sum_magnitude**2 + self.magnitude_array[1]**2 - self.magnitude_array[0]**2), 2*expected_sum_magnitude*self.magnitude_array[1])
+        angle2_2 = expected_sum_angle - np.arccos((expected_sum_magnitude**2 + self.magnitude_array[1]**2 - self.magnitude_array[0]**2), 2*expected_sum_magnitude*self.magnitude_array[1])
+        # except RuntimeWarning:
+        #     # Lagay ng showerror
+        #     pass
    
-        angle1_1 = np.arccos(expected_sum_magnitude*np.cos(expected_sum_angle) - magnitude_2*np.cos(angle2_1), magnitude_1)
-        angle1_2 = np.arccos(expected_sum_magnitude*np.cos(expected_sum_angle) - magnitude_2*np.cos(angle2_2), magnitude_1)
+        angle1_1 = np.arccos(expected_sum_magnitude*np.cos(expected_sum_angle) - self.magnitude_array[1]*np.cos(angle2_1), self.magnitude_array[0])
+        angle1_2 = np.arccos(expected_sum_magnitude*np.cos(expected_sum_angle) - self.magnitude_array[1]*np.cos(angle2_2), self.magnitude_array[0])
 
-        x1, y1 = magnitude_1*np.cos(angle1_1), magnitude_1*np.sin(angle1_1)
-        x2, y2 = magnitude_1*np.cos(angle2_1), magnitude_1*np.sin(angle2_1)
+        x: np.ndarray = np.array([self.magnitude_array[0]*np.cos(angle1_1), self.magnitude_array[0]*np.cos(angle2_1)])
+        y: np.ndarray = np.array([self.magnitude_array[0]*np.sin(angle1_1), self.magnitude_array[0]*np.sin(angle2_1)])
+        angle: np.ndarray = np.array([np.arctan2(y[0], x[0]), np.arctan2(y[1], x[1])])
 
-        self.vector_dict[vector1_name] = np.array([x1, y1])
-        self.vector_dict[vector2_name] = np.array([x2, y2])
-        self.quiver_dict[vector1_name] = self.plot.quiver(x1, y1, alpha=0.5, color="b", scale=1, scale_units="xy", angles="xy")
-        self.quiver_dict[vector2_name] = self.plot.quiver(x2, y2, alpha=0.5, color="b", scale=1, scale_units="xy", angles="xy")
-        self.tree.insert("", "end", vector1_name, values=(vector1_name, f"{x1: .6f}", f"{y1: .6f}", f"{magnitude[0]: .6f}", f"{self.angle_array[0]: .6f}"))
-        self.tree.insert("", "end", vector2_name, values=(vector2_name, f"{x2: .6f}", f"{y2: .6f}", f"{magnitude[1]: .6f}", f"{self.angle_array[1]: .6f}"))
+        self.vector_dict[vector1_name] = np.array([x[0], y[0]])
+        self.vector_dict[vector2_name] = np.array([x[1], y[1]])
+        self.quiver_dict[vector1_name] = self.plot.quiver(x[0], y[0], alpha=0.5, color="b", scale=1, scale_units="xy", angles="xy")
+        self.quiver_dict[vector2_name] = self.plot.quiver(x[1], y[1], alpha=0.5, color="b", scale=1, scale_units="xy", angles="xy")
+        self.tree.insert("", "end", vector1_name, values=(vector1_name, f"{x[0]: .6f}", f"{y[0]: .6f}", f"{self.magnitude_array[0]: .6f}", f"{angle[0]: .6f}"))
+        self.tree.insert("", "end", vector2_name, values=(vector2_name, f"{x[1]: .6f}", f"{y[1]: .6f}", f"{self.magnitude_array[1]: .6f}", f"{angle[1]: .6f}"))
 
         return
 
@@ -1151,23 +1141,23 @@ class TwoMissingDirections(BaseWindow):
 
                 showerror("Error", "Angles must be different! Might result in infinitely solutions or no solution.")
                 self.auto_update.set(0)
-                self.vector2_angle_entry.focus_set()
+                self.vector2_magnitude_entry.focus_set()
                 return
 
             try:
-                self.angle_array[0] = float(self.requirements_vars["v1_angle"].get())
+                self.magnitude_array[0] = float(self.requirements_vars["v1_magnitude"].get())
             except ValueError:
                 showerror("Error", "Value must be a valid decimal number!")
                 self.auto_update.set(0)
-                self.vector1_angle_entry.focus_set()
+                self.vector1_magnitude_entry.focus_set()
                 return
 
             try:
-                self.angle_array[1] = float(self.requirements_vars["v2_angle"].get())
+                self.magnitude_array[1] = float(self.requirements_vars["v2_magnitude"].get())
             except ValueError:
                 showerror("Error", "Value must be a valid decimal number!")
                 self.auto_update.set(0)
-                self.vector2_angle_entry.focus_set()
+                self.vector2_magnitude_entry.focus_set()
                 return
 
             if self.missing_coordinate.get():
@@ -1210,9 +1200,9 @@ class TwoMissingDirections(BaseWindow):
                     return
 
             self.vector1_name_entry.configure(state="disabled")
-            self.vector1_angle_entry.configure(state="disabled")
+            self.vector1_magnitude_entry.configure(state="disabled")
             self.vector2_name_entry.configure(state="disabled")
-            self.vector2_angle_entry.configure(state="disabled")
+            self.vector2_magnitude_entry.configure(state="disabled")
             self.resultant_req1_entry.configure(state="disabled")
             self.resultant_req2_entry.configure(state="disabled")
             self.cartesian.configure(state="disabled")
@@ -1226,16 +1216,16 @@ class TwoMissingDirections(BaseWindow):
             self.tree.insert("", "end", vector2_name, values=(vector2_name, 0, 0, 0, 0))
             self.expected_resultant = np.array([resultant_x, resultant_y])
 
-            self.find_missing_magnitudes()
+            self.find_missing_directions()
             self.get_resultant()
             self.rescale_graph()
 
         else:
 
             self.vector1_name_entry.configure(state="enabled")
-            self.vector1_angle_entry.configure(state="enabled")
+            self.vector1_magnitude_entry.configure(state="enabled")
             self.vector2_name_entry.configure(state="enabled")
-            self.vector2_angle_entry.configure(state="enabled")
+            self.vector2_magnitude_entry.configure(state="enabled")
             self.resultant_req1_entry.configure(state="enabled")
             self.resultant_req2_entry.configure(state="enabled")
             self.cartesian.configure(state="enabled")
