@@ -1012,6 +1012,7 @@ class TwoMissingDirections(BaseWindow):
 
         super().__init__(master, min_width, min_height)
 
+
         self.requirements_vars: dict[str, tk.StringVar] = {
             "v1_name": tk.StringVar(self),
             "v1_magnitude": tk.StringVar(self),
@@ -1233,8 +1234,8 @@ class TwoMissingDirections(BaseWindow):
             self.vector_dict[vector2_name + " 2"] = np.array([x2[1], y2[1]])
             self.quiver_dict[vector1_name] = self.plot.quiver(x1[0], y1[0], alpha=0.5, color="#008db9", scale=1, scale_units="xy", angles="xy")
             self.quiver_dict[vector2_name] = self.plot.quiver(x1[1], y1[1], alpha=0.5, color="#71daff", scale=1, scale_units="xy", angles="xy")
-            self.quiver_dict[vector1_name] = self.plot.quiver(x2[0], y2[0], alpha=0.5, color="#cf4a49", scale=1, scale_units="xy", angles="xy")
-            self.quiver_dict[vector2_name] = self.plot.quiver(x2[1], y2[1], alpha=0.5, color="#ff6666", scale=1, scale_units="xy", angles="xy")
+            self.quiver_dict[vector1_name + " 2"] = self.plot.quiver(x2[0], y2[0], alpha=0.5, color="#cf4a49", scale=1, scale_units="xy", angles="xy")
+            self.quiver_dict[vector2_name + " 2"] = self.plot.quiver(x2[1], y2[1], alpha=0.5, color="#ff6666", scale=1, scale_units="xy", angles="xy")
             self.tree.insert(self.tree_entries["missing"], "end", vector1_name, values=(vector1_name, f"{x1[0]: .6f}", f"{y1[0]: .6f}", f"{self.magnitude_array[0]: .6f}", f"{np.rad2deg(angle1[0]): .6f}"))
             self.tree.insert(self.tree_entries["missing"], "end", vector2_name, values=(vector2_name, f"{x1[1]: .6f}", f"{y1[1]: .6f}", f"{self.magnitude_array[1]: .6f}", f"{np.rad2deg(angle1[1]): .6f}"))
             self.tree.insert(self.tree_entries["missing"], "end", vector1_name + " 2", values=(vector1_name, f"{x2[0]: .6f}", f"{y2[0]: .6f}", f"{self.magnitude_array[0]: .6f}", f"{np.rad2deg(angle2[0]): .6f}"))
@@ -1252,7 +1253,6 @@ class TwoMissingDirections(BaseWindow):
             self.resultant_req2_entry.configure(state="enabled")
             self.cartesian.configure(state="enabled")
             self.polar.configure(state="enabled")
-            self.auto_update.set(0)
 
         return
 
@@ -1393,9 +1393,7 @@ class TwoMissingDirections(BaseWindow):
         """    
         if len(self.expected_resultant) == False:
             self.resultant_vct = sum(self.vector_dict.values()) if len(self.vector_dict) else np.array([0, 0])  # type: ignore
-            print("Here")
         else:
-            print("There")
             self.resultant_vct = self.expected_resultant      
 
         x: float = self.resultant_vct[0]
