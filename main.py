@@ -10,7 +10,6 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk  # type: ignore
 from matplotlib.quiver import Quiver
 from tkinter.messagebox import showerror
-from sympy import Eq, symbols, solve
 import warnings
 
 warnings.simplefilter("error", category=RuntimeWarning)
@@ -1252,8 +1251,6 @@ class TwoMissingDirections(BaseWindow):
             self.cartesian.configure(state="enabled")
             self.polar.configure(state="enabled")
 
-        print(self.requirements_vars["v1_magnitude"].get())
-
         return
 
     def get_expected_resultant(self) -> None:
@@ -1384,9 +1381,6 @@ class TwoMissingDirections(BaseWindow):
             self.resultant_req2_entry.configure(state="enabled")
             self.cartesian.configure(state="enabled")
             self.polar.configure(state="enabled")
-
-        print(float(self.requirements_vars["v1_magnitude"].get()))
-        print(self.magnitude_array[0])
 
         return
 
