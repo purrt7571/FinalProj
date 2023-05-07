@@ -1021,7 +1021,7 @@ class TwoMissingDirections(BaseWindow):
             "result_req2": tk.StringVar(self)
         }
         self.missing_coordinate = tk.IntVar(self, value=0)
-        self.magnitude_array = np.array([0, 0])
+        self.magnitude_array = np.array([0.0000, 0.0000])
         self.auto_update = tk.IntVar(self, value=0)
         self.expected_resultant = np.array([])
 
@@ -1252,6 +1252,8 @@ class TwoMissingDirections(BaseWindow):
             self.cartesian.configure(state="enabled")
             self.polar.configure(state="enabled")
 
+        print(self.requirements_vars["v1_magnitude"].get())
+
         return
 
     def get_expected_resultant(self) -> None:
@@ -1382,6 +1384,9 @@ class TwoMissingDirections(BaseWindow):
             self.resultant_req2_entry.configure(state="enabled")
             self.cartesian.configure(state="enabled")
             self.polar.configure(state="enabled")
+
+        print(float(self.requirements_vars["v1_magnitude"].get()))
+        print(self.magnitude_array[0])
 
         return
 
