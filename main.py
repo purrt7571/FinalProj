@@ -206,7 +206,7 @@ class BaseWindow(tk.Toplevel):
         self.master.focus_set()
         self.destroy()
         return
-    
+
 
 class ResultantWindow(BaseWindow):
 
@@ -241,8 +241,9 @@ class ResultantWindow(BaseWindow):
 
         self.add_vector_button.configure(command=self.add_vector)
         self.remove_vector_button.configure(command=self.rm_vector)
+        self.clear_all_button.configure(command=self.clear_all)
         return
-    
+
     def add_vector(self) -> None:
         """
         Add a vector to the table with a unique name and plot the vector into the plane.
@@ -325,7 +326,7 @@ class ResultantWindow(BaseWindow):
 
     # noinspection SpellCheckingInspection
     def rm_vector(self) -> None:
-        
+
         self.remove_vector()
         rx, ry, rm, rtheta = self.get_resultant()  # type: ignore
 
@@ -334,6 +335,23 @@ class ResultantWindow(BaseWindow):
         self.result_str_vars["r"].set(f"{rm: .6f}")
         self.result_str_vars["theta"].set(f"{rtheta: .6f}")  # type: ignore
 
+        self.rescale_graph()
+        return
+
+    def clear_all(self) -> None:
+
+        for i in self.quiver_dict.values():
+            i.remove()
+        self.quiver_dict.clear()
+        self.vector_dict.clear()
+        self.tree.delete(*self.tree.get_children(self.tree_entries["given"]))
+
+        self.result_str_vars["x"].set("0.000000")
+        self.result_str_vars["y"].set("0.000000")
+        self.result_str_vars["r"].set("0.000000")
+        self.result_str_vars["theta"].set("0.000000")
+
+        self.get_resultant()
         self.rescale_graph()
         return
 
