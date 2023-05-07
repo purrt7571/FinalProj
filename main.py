@@ -1414,27 +1414,6 @@ class TwoMissingDirections(BaseWindow):
 
         return
 
-    # def get_resultant(self) -> tuple[float, float, float, float]:
-    #     """
-    #     Get the resultant of the vectors listed on the table
-    #     """    
-    #     if len(self.expected_resultant) == False:
-    #         self.resultant_vct = sum(self.vector_dict.values()) if len(self.vector_dict) else np.array([0, 0])  # type: ignore
-    #     else:
-    #         self.resultant_vct = self.expected_resultant      
-
-    #     x: float = self.resultant_vct[0]
-    #     y: float = self.resultant_vct[1]
-    #     r: float = np.hypot(*self.resultant_vct)
-    #     theta: float = np.rad2deg(np.arctan2(self.resultant_vct[1], self.resultant_vct[0]))
-    #     self.resultant_str_vars["x"].set(value=f"{x: .4f}")  # type: ignore
-    #     self.resultant_str_vars["y"].set(value=f"{y: .4f}")  # type: ignore
-    #     self.resultant_str_vars["r"].set(value=f"{r: .4f}")
-    #     self.resultant_str_vars["theta"].set(value=f"{theta: .4f}")  # type: ignore
-    #     self.resultant_plot.remove()
-    #     self.resultant_plot = self.plot.quiver(*self.resultant_vct, color="black", scale=1, scale_units="xy", angles="xy")  # type: ignore
-    #     return x, y, r, theta
-
 
 def main():
 
