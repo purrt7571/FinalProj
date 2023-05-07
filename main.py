@@ -91,8 +91,7 @@ class BaseWindow(tk.Toplevel):
 
         self.tree_entries = {
             "given": self.tree.insert("", "end", text="Given"),
-            "missing": self.tree.insert("", "end", text="Missing"),
-            "other": self.tree.insert("", "end", text="Other")
+            "missing": self.tree.insert("", "end", text="Missing")
             }
 
         self.resultant_canvas = tk.Frame(self)
@@ -1010,6 +1009,7 @@ class TwoMissingDirections(BaseWindow):
     def __init__(self, master: tk.Tk, min_width: int = 900, min_height: int = 700) -> None:
 
         super().__init__(master, min_width, min_height)
+        self.tree_entries["Other Angle"] = self.tree.insert("", "end", text = "Other \u03B8")
 
         self.requirements_vars: dict[str, tk.StringVar] = {
             "v1_name": tk.StringVar(self),
@@ -1020,7 +1020,7 @@ class TwoMissingDirections(BaseWindow):
             "result_req2": tk.StringVar(self)
         }
         self.missing_coordinate = tk.IntVar(self, value=0)
-        self.magnitude_array = np.array([0.0000, 0.0000])
+        self.magnitude_array = np.array([0, 0])
         self.auto_update = tk.IntVar(self, value=0)
         self.expected_resultant = np.array([])
 
@@ -1150,6 +1150,15 @@ class TwoMissingDirections(BaseWindow):
         elif self.auto_update.get() and  vector2_name in self.tree.selection():
             showerror("Error", f"Cannot remove \"{vector2_name}\" vector while auto-updating! Please disable auto-update first.")
             return
+        
+        elif self.auto_update.get() and  vector1_name + " 2" in self.tree.selection():
+            showerror("Error", f"Cannot remove \"{vector2_name}\" vector while auto-updating! Please disable auto-update first.")
+            return
+        elif self.auto_update.get() and  vector2_name + " 2" in self.tree.selection():
+            showerror("Error", f"Cannot remove \"{vector2_name}\" vector while auto-updating! Please disable auto-update first.")
+            return
+        
+
 
         self.remove_vector()
 
@@ -1169,6 +1178,7 @@ class TwoMissingDirections(BaseWindow):
         self.vector_dict.clear()
         self.tree.delete(*self.tree.get_children(self.tree_entries["given"]))
         self.tree.delete(*self.tree.get_children(self.tree_entries["missing"]))
+        self.tree.delete(*self.tree.get_children(self.tree_entries["Other Angle"]))
         self.expected_resultant: np.ndarray = np.array([0, 0])
         for i in self.vector_str_vars.values():
             i.set("")
@@ -1213,6 +1223,7 @@ class TwoMissingDirections(BaseWindow):
         expected_sum_magnitude = np.hypot(expected_sum[0], expected_sum[1])
         expected_sum_angle = np.arctan2(expected_sum[1], expected_sum[0])
 
+
         try:
             angle2_1 = expected_sum_angle + np.arccos((expected_sum_magnitude**2 + self.magnitude_array[1]**2 - self.magnitude_array[0]**2)/(2*expected_sum_magnitude*self.magnitude_array[1]))
             angle2_2 = expected_sum_angle - np.arccos((expected_sum_magnitude**2 + self.magnitude_array[1]**2 - self.magnitude_array[0]**2)/(2*expected_sum_magnitude*self.magnitude_array[1]))
@@ -1226,19 +1237,42 @@ class TwoMissingDirections(BaseWindow):
             angle1: np.ndarray = np.array([np.arctan2(y1[0], x1[0]), np.arctan2(y1[1], x1[1])])
             angle2: np.ndarray = np.array([np.arctan2(y2[0], x2[0]), np.arctan2(y2[1], x2[1])])
 
-            self.vector_dict[vector1_name] = np.array([x1[0], y1[0]])
-            self.vector_dict[vector2_name] = np.array([x1[1], y1[1]])
-            self.vector_dict[vector1_name + " 2"] = np.array([x2[0], y2[0]])
-            self.vector_dict[vector2_name + " 2"] = np.array([x2[1], y2[1]])
-            self.quiver_dict[vector1_name] = self.plot.quiver(x1[0], y1[0], alpha=0.5, color="#008db9", scale=1, scale_units="xy", angles="xy")
-            self.quiver_dict[vector2_name] = self.plot.quiver(x1[1], y1[1], alpha=0.5, color="#71daff", scale=1, scale_units="xy", angles="xy")
-            self.quiver_dict[vector1_name + " 2"] = self.plot.quiver(x2[0], y2[0], alpha=0.5, color="#cf4a49", scale=1, scale_units="xy", angles="xy")
-            self.quiver_dict[vector2_name + " 2"] = self.plot.quiver(x2[1], y2[1], alpha=0.5, color="#ff6666", scale=1, scale_units="xy", angles="xy")
-            self.tree.insert(self.tree_entries["missing"], "end", vector1_name, values=(vector1_name, f"{x1[0]: .6f}", f"{y1[0]: .6f}", f"{self.magnitude_array[0]: .6f}", f"{np.rad2deg(angle1[0]): .6f}"))
-            self.tree.insert(self.tree_entries["missing"], "end", vector2_name, values=(vector2_name, f"{x1[1]: .6f}", f"{y1[1]: .6f}", f"{self.magnitude_array[1]: .6f}", f"{np.rad2deg(angle1[1]): .6f}"))
-            self.tree.insert(self.tree_entries["missing"], "end", vector1_name + " 2", values=(vector1_name, f"{x2[0]: .6f}", f"{y2[0]: .6f}", f"{self.magnitude_array[0]: .6f}", f"{np.rad2deg(angle2[0]): .6f}"))
-            self.tree.insert(self.tree_entries["missing"], "end", vector2_name + " 2", values=(vector2_name, f"{x2[1]: .6f}", f"{y2[1]: .6f}", f"{self.magnitude_array[1]: .6f}", f"{np.rad2deg(angle2[1]): .6f}"))
-            self.tree.item(self.tree_entries["missing"], open=True)
+            check_sum1 = np.around(sum(self.vector_dict.values()) + np.array([x1[0], y1[0]]) + np.array([x1[1], y1[1]]), decimals =8)
+            check_sum2 = np.around(sum(self.vector_dict.values()) + np.array([x2[0], y2[0]]) + np.array([x2[1], y2[1]]), decimals =8)
+
+            if (check_sum1 == self.expected_resultant).all() and (check_sum2 != self.expected_resultant).all():
+                self.vector_dict[vector1_name] = np.array([x1[0], y1[0]])
+                self.vector_dict[vector2_name] = np.array([x1[1], y1[1]])
+                self.quiver_dict[vector1_name] = self.plot.quiver(x1[0], y1[0], alpha=0.5, color="#008db9", scale=1, scale_units="xy", angles="xy")
+                self.quiver_dict[vector2_name] = self.plot.quiver(x1[1], y1[1], alpha=0.5, color="#71daff", scale=1, scale_units="xy", angles="xy")
+                self.tree.insert(self.tree_entries["missing"], "end", vector1_name, values=(vector1_name, f"{x1[0]: .6f}", f"{y1[0]: .6f}", f"{self.magnitude_array[0]: .6f}", f"{np.rad2deg(angle1[0]): .6f}"))
+                self.tree.insert(self.tree_entries["missing"], "end", vector2_name, values=(vector2_name, f"{x1[1]: .6f}", f"{y1[1]: .6f}", f"{self.magnitude_array[1]: .6f}", f"{np.rad2deg(angle1[1]): .6f}"))
+                self.tree.item(self.tree_entries["missing"], open=True)
+   
+            elif (check_sum2 == self.expected_resultant).all() and (check_sum1 != self.expected_resultant).all():
+                self.vector_dict[vector1_name] = np.array([x2[0], y2[0]])
+                self.vector_dict[vector2_name] = np.array([x2[1], y2[1]])
+                self.quiver_dict[vector1_name] = self.plot.quiver(x2[0], y2[0], alpha=0.5, color="#cf4a49", scale=1, scale_units="xy", angles="xy")
+                self.quiver_dict[vector2_name] = self.plot.quiver(x2[1], y2[1], alpha=0.5, color="#ff6666", scale=1, scale_units="xy", angles="xy")
+                self.tree.insert(self.tree_entries["missing"], "end", vector1_name, values=(vector1_name, f"{x2[0]: .6f}", f"{y2[0]: .6f}", f"{self.magnitude_array[0]: .6f}", f"{np.rad2deg(angle2[0]): .6f}"))
+                self.tree.insert(self.tree_entries["missing"], "end", vector2_name, values=(vector2_name, f"{x2[1]: .6f}", f"{y2[1]: .6f}", f"{self.magnitude_array[1]: .6f}", f"{np.rad2deg(angle2[1]): .6f}"))
+                self.tree.item(self.tree_entries["missing"], open=True)
+
+            elif (check_sum1 == self.expected_resultant).all() and (check_sum2 == self.expected_resultant).all():
+                self.vector_dict[vector1_name] = np.array([x1[0], y1[0]])
+                self.vector_dict[vector2_name] = np.array([x1[1], y1[1]])
+                self.vector_dict[vector1_name + " 2"] = np.array([x2[0], y2[0]])
+                self.vector_dict[vector2_name + " 2"] = np.array([x2[1], y2[1]])
+                self.quiver_dict[vector1_name] = self.plot.quiver(x1[0], y1[0], alpha=0.5, color="#008db9", scale=1, scale_units="xy", angles="xy")
+                self.quiver_dict[vector2_name] = self.plot.quiver(x1[1], y1[1], alpha=0.5, color="#71daff", scale=1, scale_units="xy", angles="xy")
+                self.quiver_dict[vector1_name + " 2"] = self.plot.quiver(x2[0], y2[0], alpha=0.5, color="#cf4a49", scale=1, scale_units="xy", angles="xy")
+                self.quiver_dict[vector2_name + " 2"] = self.plot.quiver(x2[1], y2[1], alpha=0.5, color="#ff6666", scale=1, scale_units="xy", angles="xy")
+                self.tree.insert(self.tree_entries["missing"], "end", vector1_name, values=(vector1_name, f"{x1[0]: .6f}", f"{y1[0]: .6f}", f"{self.magnitude_array[0]: .6f}", f"{np.rad2deg(angle1[0]): .6f}"))
+                self.tree.insert(self.tree_entries["missing"], "end", vector2_name, values=(vector2_name, f"{x1[1]: .6f}", f"{y1[1]: .6f}", f"{self.magnitude_array[1]: .6f}", f"{np.rad2deg(angle1[1]): .6f}"))
+                self.tree.insert(self.tree_entries["Other Angle"], "end", vector1_name + " 2", values=(vector1_name, f"{x2[0]: .6f}", f"{y2[0]: .6f}", f"{self.magnitude_array[0]: .6f}", f"{np.rad2deg(angle2[0]): .6f}"))
+                self.tree.insert(self.tree_entries["Other Angle"], "end", vector2_name + " 2", values=(vector2_name, f"{x2[1]: .6f}", f"{y2[1]: .6f}", f"{self.magnitude_array[1]: .6f}", f"{np.rad2deg(angle2[1]): .6f}"))
+                self.tree.item(self.tree_entries["missing"], open=True)
+                self.tree.item(self.tree_entries["Other Angle"], open=True)
 
         except RuntimeWarning:
             showerror("Error", "There is no valid solution!")
