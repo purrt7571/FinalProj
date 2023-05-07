@@ -35,7 +35,7 @@ class BaseWindow(tk.Toplevel):
         self.coordinate: tk.IntVar = tk.IntVar(self, value=0)
         self.vector_dict: dict[str, np.ndarray] = {}
         self.quiver_dict: dict[str, Quiver] = {}
-        self.resultant_vct: np.ndarray = np.array([0, 0])
+        self.resultant_vct: np.ndarray = np.array([0., 0.])
         self.resultant_str_vars: dict[str, tk.StringVar] = {
             "x": tk.StringVar(self, "0.0000"),
             "y": tk.StringVar(self, "0.0000"),
@@ -160,7 +160,7 @@ class BaseWindow(tk.Toplevel):
         """
         Get the resultant of the vectors listed on the table
         """
-        self.resultant_vct = sum(self.vector_dict.values()) if len(self.vector_dict) else np.array([0, 0])  # type: ignore
+        self.resultant_vct = sum(self.vector_dict.values()) if len(self.vector_dict) else np.array([0., 0.])  # type: ignore
         x: float = self.resultant_vct[0]
         y: float = self.resultant_vct[1]
         r: float = np.hypot(*self.resultant_vct)
@@ -385,7 +385,7 @@ class OneMissingVector(BaseWindow):
             "theta": tk.StringVar(self)
         }
         self.auto_update: tk.IntVar = tk.IntVar(self, value=0)
-        self.expected_resultant: np.ndarray = np.array([0, 0])
+        self.expected_resultant: np.ndarray = np.array([0., 0.])
 
         ttk.Label(self.missing_vector_frame, text="Vector name: ").grid(column=0, row=0, sticky="nw", padx=10)
         ttk.Label(self.missing_vector_frame, text="X / R : ").grid(column=0, row=2, sticky="ew", padx=10)
@@ -533,7 +533,7 @@ class OneMissingVector(BaseWindow):
         self.vector_dict.clear()
         self.tree.delete(*self.tree.get_children(self.tree_entries["given"]))
         self.tree.delete(*self.tree.get_children(self.tree_entries["missing"]))
-        self.expected_resultant: np.ndarray = np.array([0, 0])
+        self.expected_resultant: np.ndarray = np.array([0., 0.])
         for i in self.vector_str_vars.values():
             i.set("")
         for i in self.expected_resultant_vars.values():
@@ -562,7 +562,7 @@ class OneMissingVector(BaseWindow):
         self.quiver_dict[vector_name].remove()
         self.tree.delete(vector_name)
 
-        missing_vector: np.ndarray = self.expected_resultant - (sum(self.vector_dict.values()) if len(self.vector_dict) else np.array([0, 0]))
+        missing_vector: np.ndarray = self.expected_resultant - (sum(self.vector_dict.values()) if len(self.vector_dict) else np.array([0., 0.]))
         x, y = missing_vector[0], missing_vector[1]
         magnitude = np.hypot(x, y)
         direction = np.rad2deg(np.arctan2(y, x))
@@ -649,7 +649,7 @@ class OneMissingVector(BaseWindow):
             self.cartesian.configure(state="disabled")
             self.polar.configure(state="disabled")
 
-            self.vector_dict[vector_name] = np.array([0, 0])
+            self.vector_dict[vector_name] = np.array([0., 0.])
             self.quiver_dict[vector_name] = self.plot.quiver(0, 0)
             self.tree.insert(self.tree_entries["missing"], "end", vector_name, values=(vector_name, 0, 0, 0, 0))
             self.expected_resultant = np.array([x, y])
@@ -684,9 +684,9 @@ class TwoMissingMagnitudes(BaseWindow):
             "result_req2": tk.StringVar(self)
         }
         self.missing_coordinate = tk.IntVar(self, value=0)
-        self.angle_array = np.array([0, 0])
+        self.angle_array = np.array([0., 0.])
         self.auto_update = tk.IntVar(self, value=0)
-        self.expected_resultant = np.array([0, 0])
+        self.expected_resultant = np.array([0., 0.])
 
         self.missing_magnitudes_frame = ttk.Labelframe(self.control_panel, text="Two Missing Magnitudes (Blue)")
         self.missing_magnitudes_frame.grid(column=0, row=2, sticky="new", padx=10, pady=10)
@@ -833,7 +833,7 @@ class TwoMissingMagnitudes(BaseWindow):
         self.vector_dict.clear()
         self.tree.delete(*self.tree.get_children(self.tree_entries["given"]))
         self.tree.delete(*self.tree.get_children(self.tree_entries["missing"]))
-        self.expected_resultant: np.ndarray = np.array([0, 0])
+        self.expected_resultant: np.ndarray = np.array([0., 0.])
         for i in self.vector_str_vars.values():
             i.set("")
         for i in self.requirements_vars.values():
@@ -865,7 +865,7 @@ class TwoMissingMagnitudes(BaseWindow):
         self.tree.delete(vector1_name)
         self.tree.delete(vector2_name)
 
-        expected_sum: np.ndarray = self.expected_resultant - (sum(self.vector_dict.values()) if len(self.vector_dict) else np.array([0, 0]))
+        expected_sum: np.ndarray = self.expected_resultant - (sum(self.vector_dict.values()) if len(self.vector_dict) else np.array([0., 0.]))
         angle_rad_array: np.ndarray = np.radians(self.angle_array)
         matrix = np.array([np.cos(angle_rad_array), np.sin(angle_rad_array)])
         inverted_matrix = np.linalg.inv(matrix)
@@ -995,8 +995,8 @@ class TwoMissingMagnitudes(BaseWindow):
             self.cartesian.configure(state="disabled")
             self.polar.configure(state="disabled")
 
-            self.vector_dict[vector1_name] = np.array([0, 0])
-            self.vector_dict[vector2_name] = np.array([0, 0])
+            self.vector_dict[vector1_name] = np.array([0., 0.])
+            self.vector_dict[vector2_name] = np.array([0., 0.])
             self.quiver_dict[vector1_name] = self.plot.quiver(0, 0)
             self.quiver_dict[vector2_name] = self.plot.quiver(0, 0)
             self.tree.insert(self.tree_entries["missing"], "end", vector1_name, values=(vector1_name, 0, 0, 0, 0))
