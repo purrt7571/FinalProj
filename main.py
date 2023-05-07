@@ -90,8 +90,7 @@ class BaseWindow(tk.Toplevel):
 
         self.tree_entries = {
             "given": self.tree.insert("", "end", text="Given"),
-            "missing": self.tree.insert("", "end", text="Missing"),
-            "other": self.tree.insert("", "end", text="Other")
+            "missing": self.tree.insert("", "end", text="Missing")
             }
 
         self.resultant_canvas = tk.Frame(self)
