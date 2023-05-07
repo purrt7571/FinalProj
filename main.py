@@ -1020,7 +1020,7 @@ class TwoMissingDirections(BaseWindow):
             "result_req2": tk.StringVar(self)
         }
         self.missing_coordinate = tk.IntVar(self, value=0)
-        self.magnitude_array = np.array([0, 0])
+        self.magnitude_array = np.array([0., 0.])
         self.auto_update = tk.IntVar(self, value=0)
         self.expected_resultant = np.array([])
 
@@ -1261,8 +1261,6 @@ class TwoMissingDirections(BaseWindow):
             elif (check_sum1 == self.expected_resultant).all() and (check_sum2 == self.expected_resultant).all():
                 self.vector_dict[vector1_name] = np.array([x1[0], y1[0]])
                 self.vector_dict[vector2_name] = np.array([x1[1], y1[1]])
-                self.vector_dict[vector1_name + " 2"] = np.array([x2[0], y2[0]])
-                self.vector_dict[vector2_name + " 2"] = np.array([x2[1], y2[1]])
                 self.quiver_dict[vector1_name] = self.plot.quiver(x1[0], y1[0], alpha=0.5, color="#008db9", scale=1, scale_units="xy", angles="xy")
                 self.quiver_dict[vector2_name] = self.plot.quiver(x1[1], y1[1], alpha=0.5, color="#71daff", scale=1, scale_units="xy", angles="xy")
                 self.quiver_dict[vector1_name + " 2"] = self.plot.quiver(x2[0], y2[0], alpha=0.5, color="#cf4a49", scale=1, scale_units="xy", angles="xy")
