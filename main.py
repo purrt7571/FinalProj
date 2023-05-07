@@ -1012,7 +1012,6 @@ class TwoMissingDirections(BaseWindow):
 
         super().__init__(master, min_width, min_height)
 
-
         self.requirements_vars: dict[str, tk.StringVar] = {
             "v1_name": tk.StringVar(self),
             "v1_magnitude": tk.StringVar(self),
@@ -1221,10 +1220,10 @@ class TwoMissingDirections(BaseWindow):
             angle1_1 = np.arccos((expected_sum_magnitude*np.cos(expected_sum_angle) - self.magnitude_array[1]*np.cos(angle2_1))/self.magnitude_array[0])
             angle1_2 = np.arccos((expected_sum_magnitude*np.cos(expected_sum_angle) - self.magnitude_array[1]*np.cos(angle2_2))/self.magnitude_array[0])
 
-            x1: np.ndarray = np.array([self.magnitude_array[0]*np.cos(angle1_1), self.magnitude_array[0]*np.cos(angle2_1)])
-            y1: np.ndarray = np.array([self.magnitude_array[0]*np.sin(angle1_1), self.magnitude_array[0]*np.sin(angle2_1)])
-            x2: np.ndarray = np.array([self.magnitude_array[0]*np.cos(angle1_2), self.magnitude_array[0]*np.cos(angle2_2)])
-            y2: np.ndarray = np.array([self.magnitude_array[0]*np.sin(angle1_2), self.magnitude_array[0]*np.sin(angle2_2)])
+            x1: np.ndarray = np.array([self.magnitude_array[0]*np.cos(angle1_1), self.magnitude_array[1]*np.cos(angle2_1)])
+            y1: np.ndarray = np.array([self.magnitude_array[0]*np.sin(angle1_1), self.magnitude_array[1]*np.sin(angle2_1)])
+            x2: np.ndarray = np.array([self.magnitude_array[0]*np.cos(angle1_2), self.magnitude_array[1]*np.cos(angle2_2)])
+            y2: np.ndarray = np.array([self.magnitude_array[0]*np.sin(angle1_2), self.magnitude_array[1]*np.sin(angle2_2)])
             angle1: np.ndarray = np.array([np.arctan2(y1[0], x1[0]), np.arctan2(y1[1], x1[1])])
             angle2: np.ndarray = np.array([np.arctan2(y2[0], x2[0]), np.arctan2(y2[1], x2[1])])
 
@@ -1241,7 +1240,6 @@ class TwoMissingDirections(BaseWindow):
             self.tree.insert(self.tree_entries["missing"], "end", vector1_name + " 2", values=(vector1_name, f"{x2[0]: .6f}", f"{y2[0]: .6f}", f"{self.magnitude_array[0]: .6f}", f"{np.rad2deg(angle2[0]): .6f}"))
             self.tree.insert(self.tree_entries["missing"], "end", vector2_name + " 2", values=(vector2_name, f"{x2[1]: .6f}", f"{y2[1]: .6f}", f"{self.magnitude_array[1]: .6f}", f"{np.rad2deg(angle2[1]): .6f}"))
             self.tree.item(self.tree_entries["missing"], open=True)
-
 
         except RuntimeWarning:
             showerror("Error", "There is no valid solution!")
