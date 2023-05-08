@@ -16,11 +16,9 @@ warnings.simplefilter("error", category=RuntimeWarning)
 
 
 class BaseWindow(tk.Toplevel):
-
     """
     Base window for each case with a control panel, table, resultant, and graphing plane.
     """
-
     def __init__(self, master: tk.Tk, min_width: int = 900, min_height: int = 700) -> None:
 
         super().__init__(master=master)
@@ -216,8 +214,9 @@ class BaseWindow(tk.Toplevel):
 
 
 class ResultantWindow(BaseWindow):
-
-    """Window Class made for getting the resultant of the given vectors"""
+    """
+    Window Class made for getting the resultant of the given vectors
+    """
     def __init__(self, master: tk.Tk, min_width: int = 900, min_height: int = 700) -> None:
         super().__init__(master, min_width, min_height)
 
@@ -363,9 +362,7 @@ class ResultantWindow(BaseWindow):
         return
 
 
-
 class OneMissingVector(BaseWindow):
-
     """
     Window Class for finding one vector with missing angle and magnitude.
     """
@@ -678,7 +675,9 @@ class OneMissingVector(BaseWindow):
 
 
 class TwoMissingMagnitudes(BaseWindow):
-
+    """
+    Window Class for finding the magnitudes of two vectors given their angles.
+    """
     def __init__(self, master: tk.Tk, min_width: int = 900, min_height: int = 700) -> None:
 
         super().__init__(master, min_width, min_height)
@@ -1030,7 +1029,9 @@ class TwoMissingMagnitudes(BaseWindow):
 
 
 class TwoMissingDirections(BaseWindow):
-
+    """
+    Window Class for finding the angles of two vectors given their magnitudes.
+    """
     def __init__(self, master: tk.Tk, min_width: int = 900, min_height: int = 700) -> None:
 
         super().__init__(master, min_width, min_height)
