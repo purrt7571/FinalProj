@@ -1,16 +1,17 @@
 """
 VectorSim - Python Program for simulating vectors and computing for unknown variables
 """
-import numpy as np
 import tkinter as tk
+import warnings
 from tkinter import ttk
+from tkinter.messagebox import showerror
+
+import numpy as np
 from hdpitkinter import HdpiTk
 from matplotlib.axes import Axes
-from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk  # type: ignore
+from matplotlib.figure import Figure
 from matplotlib.quiver import Quiver
-from tkinter.messagebox import showerror
-import warnings
 
 warnings.simplefilter("error", category=RuntimeWarning)
 
