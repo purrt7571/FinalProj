@@ -1278,7 +1278,6 @@ class TwoMissingDirections(BaseWindow):
 
         except RuntimeWarning:
             showerror("Error", "There is no valid solution!")
-            self.is_noSolution = True
 
         return
 
