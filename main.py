@@ -1092,7 +1092,7 @@ class TwoMissingDirections(BaseWindow):
         self.remove_vector_button.configure(command=self.rm_vector)
         self.clear_all_button.configure(command=self.clear_all)
 
-        self.no_solution_label = ttk.Label(self.control_panel, foreground="#CC2020", font=("Sans Serif", 12))
+        self.no_solution_label = ttk.Label(self.control_panel, foreground="#DD2020", font=("Sans Serif", 12))
         self.no_solution_label.grid(row=3, padx=20, pady=3, sticky="nw")
         return
 
