@@ -1173,7 +1173,10 @@ class TwoMissingDirections(BaseWindow):
 
         self.auto_update.set(0)
         for i in self.quiver_dict.values():
-            i.remove()
+            try:
+                i.remove()
+            except:
+                pass
         self.quiver_dict.clear()
         self.vector_dict.clear()
         self.tree.delete(*self.tree.get_children(self.tree_entries["given"]))
@@ -1204,12 +1207,15 @@ class TwoMissingDirections(BaseWindow):
         vector1_name = self.requirements_vars["v1_name"].get()
         vector2_name = self.requirements_vars["v2_name"].get()
 
-        self.vector_dict.pop(vector1_name)
-        self.vector_dict.pop(vector2_name)
-        self.quiver_dict[vector1_name].remove()
-        self.quiver_dict[vector2_name].remove()
-        self.tree.delete(vector1_name)
-        self.tree.delete(vector2_name)
+        try:
+            self.vector_dict.pop(vector1_name)
+            self.vector_dict.pop(vector2_name)
+            self.quiver_dict[vector1_name].remove()
+            self.quiver_dict[vector2_name].remove()
+            self.tree.delete(vector1_name)
+            self.tree.delete(vector2_name)
+        except:
+            pass
 
         if vector1_name + ' 2' in self.quiver_dict:
             self.quiver_dict[vector1_name + " 2"].remove()
@@ -1235,10 +1241,10 @@ class TwoMissingDirections(BaseWindow):
             angle1: np.ndarray = np.array([np.arctan2(y1[0], x1[0]), np.arctan2(y1[1], x1[1])])
             angle2: np.ndarray = np.array([np.arctan2(y2[0], x2[0]), np.arctan2(y2[1], x2[1])])
 
-            check_sum1 = np.around(sum(self.vector_dict.values()) + np.array([x1[0], y1[0]]) + np.array([x1[1], y1[1]]), decimals =8)
-            check_sum2 = np.around(sum(self.vector_dict.values()) + np.array([x2[0], y2[0]]) + np.array([x2[1], y2[1]]), decimals =8)
+            self.check_sum1 = np.around(sum(self.vector_dict.values()) + np.array([x1[0], y1[0]]) + np.array([x1[1], y1[1]]), decimals =8)
+            self.check_sum2 = np.around(sum(self.vector_dict.values()) + np.array([x2[0], y2[0]]) + np.array([x2[1], y2[1]]), decimals =8)
 
-            if (check_sum1 == self.expected_resultant).all() and (check_sum2 != self.expected_resultant).all():
+            if (self.check_sum1 == self.expected_resultant).all() and (self.check_sum2 != self.expected_resultant).all():
                 self.vector_dict[vector1_name] = np.array([x1[0], y1[0]])
                 self.vector_dict[vector2_name] = np.array([x1[1], y1[1]])
                 self.quiver_dict[vector1_name] = self.plot.quiver(x1[0], y1[0], alpha=0.5, color="#008db9", scale=1, scale_units="xy", angles="xy")
@@ -1246,8 +1252,8 @@ class TwoMissingDirections(BaseWindow):
                 self.tree.insert(self.tree_entries["missing"], "end", vector1_name, values=(vector1_name, f"{x1[0]: .6f}", f"{y1[0]: .6f}", f"{self.magnitude_array[0]: .6f}", f"{np.rad2deg(angle1[0]): .6f}"))
                 self.tree.insert(self.tree_entries["missing"], "end", vector2_name, values=(vector2_name, f"{x1[1]: .6f}", f"{y1[1]: .6f}", f"{self.magnitude_array[1]: .6f}", f"{np.rad2deg(angle1[1]): .6f}"))
                 self.tree.item(self.tree_entries["missing"], open=True)
-   
-            elif (check_sum2 == self.expected_resultant).all() and (check_sum1 != self.expected_resultant).all():
+
+            elif (self.check_sum2 == self.expected_resultant).all() and (self.check_sum1 != self.expected_resultant).all():
                 self.vector_dict[vector1_name] = np.array([x2[0], y2[0]])
                 self.vector_dict[vector2_name] = np.array([x2[1], y2[1]])
                 self.quiver_dict[vector1_name] = self.plot.quiver(x2[0], y2[0], alpha=0.5, color="#cf4a49", scale=1, scale_units="xy", angles="xy")
@@ -1256,7 +1262,7 @@ class TwoMissingDirections(BaseWindow):
                 self.tree.insert(self.tree_entries["missing"], "end", vector2_name, values=(vector2_name, f"{x2[1]: .6f}", f"{y2[1]: .6f}", f"{self.magnitude_array[1]: .6f}", f"{np.rad2deg(angle2[1]): .6f}"))
                 self.tree.item(self.tree_entries["missing"], open=True)
 
-            elif (check_sum1 == self.expected_resultant).all() and (check_sum2 == self.expected_resultant).all():
+            elif (self.check_sum1 == self.expected_resultant).all() and (self.check_sum2 == self.expected_resultant).all():
                 self.vector_dict[vector1_name] = np.array([x1[0], y1[0]])
                 self.vector_dict[vector2_name] = np.array([x1[1], y1[1]])
                 self.quiver_dict[vector1_name] = self.plot.quiver(x1[0], y1[0], alpha=0.5, color="#008db9", scale=1, scale_units="xy", angles="xy")
@@ -1272,14 +1278,7 @@ class TwoMissingDirections(BaseWindow):
 
         except RuntimeWarning:
             showerror("Error", "There is no valid solution!")
-            self.vector1_name_entry.configure(state="enabled")
-            self.vector1_magnitude_entry.configure(state="enabled")
-            self.vector2_name_entry.configure(state="enabled")
-            self.vector2_magnitude_entry.configure(state="enabled")
-            self.resultant_req1_entry.configure(state="enabled")
-            self.resultant_req2_entry.configure(state="enabled")
-            self.cartesian.configure(state="enabled")
-            self.polar.configure(state="enabled")
+            self.is_noSolution = True
 
         return
 
