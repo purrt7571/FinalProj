@@ -1091,6 +1091,9 @@ class TwoMissingDirections(BaseWindow):
         self.add_vector_button.configure(command=self.add_vector)
         self.remove_vector_button.configure(command=self.rm_vector)
         self.clear_all_button.configure(command=self.clear_all)
+
+        self.no_solution_label = ttk.Label(self.control_panel, foreground="#CC2020", font=("Sans Serif", 12))
+        self.no_solution_label.grid(row=3, padx=20, pady=3, sticky="nw")
         return
 
     def add_vector(self) -> None:
@@ -1240,6 +1243,7 @@ class TwoMissingDirections(BaseWindow):
 
     def find_missing_directions(self) -> None:
 
+        self.no_solution_label.configure(text="")
         vector1_name = self.requirements_vars["v1_name"].get()
         vector2_name = self.requirements_vars["v2_name"].get()
 
@@ -1323,7 +1327,7 @@ class TwoMissingDirections(BaseWindow):
                 return
 
         except RuntimeWarning:
-            showerror("Error", "There is no valid solution!")
+            self.no_solution_label.configure(text="\u24D8 There is no valid solution!")
 
         return
 
