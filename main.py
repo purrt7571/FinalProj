@@ -1236,6 +1236,7 @@ class TwoMissingDirections(BaseWindow):
         self.resultant_req2_entry.configure(state="enabled")
         self.cartesian.configure(state="enabled")
         self.polar.configure(state="enabled")
+        self.no_solution_label.configure(text="")
 
         self.get_resultant()
         self.rescale_graph()
@@ -1250,8 +1251,8 @@ class TwoMissingDirections(BaseWindow):
         if vector1_name in self.vector_dict:
             self.vector_dict.pop(vector1_name)
             self.vector_dict.pop(vector2_name)
-            self.quiver_dict[vector1_name].remove()
-            self.quiver_dict[vector2_name].remove()
+            self.quiver_dict.pop(vector1_name).remove()
+            self.quiver_dict.pop(vector2_name).remove()
             self.tree.delete(vector1_name)
             self.tree.delete(vector2_name)
 
